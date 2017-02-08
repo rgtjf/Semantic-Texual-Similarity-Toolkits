@@ -1,22 +1,13 @@
 # coding:utf-8
 from __future__ import print_function
 
-import os
 import pickle
-import time
-
-import config
-import data_tools
-
 from numpy import shape
-from sklearn import neighbors
-from sklearn import svm, tree, preprocessing
+from sklearn import preprocessing
 from sklearn.datasets import load_svmlight_file
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import GradientBoostingRegressor, AdaBoostRegressor, BaggingRegressor
-from sklearn.linear_model import LinearRegression, Lasso, Ridge
-from sklearn.neural_network.multilayer_perceptron import MLPRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+
+import utils
 
 
 class Strategy(object):
@@ -43,6 +34,8 @@ class Classifier(object):
 
 
 __all__ = [
+    "Strategy",
+    "Classifier",
     "RandomForestRegression",
     "GradientBoostingRegression",
     "AverageEnsemble"
@@ -92,7 +85,7 @@ class RandomForestRegression(Strategy):
         y_pred = clf.predict(X_test_minmax.toarray())
 
         print("==> Save the result ...")
-        with data_tools.create_write_file(result_file_path) as f:
+        with utils.create_write_file(result_file_path) as f:
             for y in y_pred:
                 print(y, file=f)
         return y_pred
@@ -141,7 +134,7 @@ class GradientBoostingRegression(Strategy):
         y_pred = clf.predict(X_test_minmax.toarray())
 
         print("==> Save the result ...")
-        with data_tools.create_write_file(result_file_path) as f:
+        with utils.create_write_file(result_file_path) as f:
             for y in y_pred:
                 print(y, file=f)
         return y_pred
@@ -171,7 +164,7 @@ class AverageEnsemble(Strategy):
             y_pred.append(x)
 
         print("==> Save the result ...")
-        with data_tools.create_write_file(result_file_path) as f:
+        with utils.create_write_file(result_file_path) as f:
             for y in y_pred:
                 print(y, file=f)
         return y_pred

@@ -3,7 +3,7 @@ import scipy.stats as meas
 
 def evaluation(predict, gold):
     """
-
+    pearsonr of predict and gold
     :param predict: list
     :param gold: list
     :return: mape
@@ -32,7 +32,6 @@ def eval_file_corpus(predict_file_list, gold_file_list):
     golds = [float(x.strip().split()[0]) for x in golds]
     pearsonr = evaluation(predicts, golds)
     return pearsonr
-
 
 
 if __name__ == '__main__':

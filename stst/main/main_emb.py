@@ -1,11 +1,10 @@
 # coding: utf8
 from __future__ import print_function
 
+from stst.data_tools import data_utils
 from stst.evaluation import *
-from stst.features.features_embedding import *
 from stst.main import record
 from stst.model import Model
-from stst.data_tools import data_utils
 
 def get_sim_model(dev_parse_data, dev_file, dev_gs):
     pass

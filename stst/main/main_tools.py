@@ -1,9 +1,9 @@
 # coding: utf8
 import cparams
 
+from stst.data_tools import data_utils
 from stst.evaluation import *
 from stst.record import *
-from stst.data_tools import data_utils
 
 
 def make_features(model):
@@ -40,7 +40,7 @@ def train_en(model, out_list=None):
 
 def test_en(model):
     if cparams.test_sick:
-        test_files = [ config.TEST_FILES['sick'] ]
+        test_files = [config.TEST_FILES['sick']]
     else:
         test_files = config.TEST_FILES['sts-en-en']
     task = 'sts-en-en'
@@ -151,7 +151,7 @@ def train_wmt(model):
     corpus = test_files[task][0]
     translator = 'googleapi_v2'
     train_file = config.TEST_DIR + '/' + task + '/' + translator + '/' \
-               + corpus.replace('input', translator.replace('microsoftapi', 'msapi'))
+                 + corpus.replace('input', translator.replace('microsoftapi', 'msapi'))
     train_gs_file = config.TEST_DIR + '/' + task + '/' + corpus
     train_gs_file = train_gs_file.replace('input', 'gs')
     train_parse_data = data_utils.load_parse_data(train_file, train_gs_file, flag=False)
@@ -274,8 +274,3 @@ def hill_climbing(model, test_func, choose_list=[]):
 
 if __name__ == '__main__':
     pass
-
-    # for key in config.TEST_FILES:
-    #     print(key)
-
-    # parse_files()

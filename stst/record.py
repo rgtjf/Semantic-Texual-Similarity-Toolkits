@@ -1,9 +1,11 @@
 # coding: utf8
 from __future__ import print_function
 
-import numpy as np
-import config
 import csv
+
+import numpy as np
+
+import config
 
 
 def record(train_file, dev_file, pearsonr, model):

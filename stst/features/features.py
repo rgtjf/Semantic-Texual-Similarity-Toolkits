@@ -1,10 +1,10 @@
 # coding: utf8
 from __future__ import print_function
 
-import utils
 import json, pyprind
 import os
 
+from .. import utils
 
 class Feature(object):
     def __init__(self,
@@ -34,11 +34,6 @@ class Feature(object):
     def load_instances(self, train_instances):
         """ extract features from train_set """
 
-        # if os.path.isfile(self.feature_file):
-        #     with utils.create_read_file(self.feature_file) as f:
-        #         l = len(f.readlines())
-        # if self.load is False or not os.path.isfile(self.feature_file) or l != len(train_instances):
-
         if self.load is False or not os.path.isfile(self.feature_file):
             print(self.feature_file)
 
@@ -58,7 +53,6 @@ class Feature(object):
         # first extract information from train_instance
         # for only be used to extract data_set information and can reuse the pyprind
         self.extract_information(train_instances)
-
         features = []
         infos = []
         process_bar = pyprind.ProgPercent(len(train_instances))
@@ -134,11 +128,6 @@ class Feature(object):
         return feat_string
 
     @staticmethod
-    def _info_list_to_string(info_list):
-        info_string = json.dumps(info_list)
-        return info_string
-
-    @staticmethod
     def _feat_string_to_list(feat_string, ndim):
         feat_list = [0] * ndim
         for feat in feat_string.split():
@@ -148,6 +137,10 @@ class Feature(object):
             feat_list[index] = value
         return feat_list
 
+    @staticmethod
+    def _info_list_to_string(info_list):
+        info_string = json.dumps(info_list)
+        return info_string
 
 class CustomFeature(Feature):
     def extract(self, train_instance):

@@ -1,6 +1,5 @@
 # coding: utf8
 from __future__ import print_function
-import config, data_tools
 
 
 # f = utils.create_write_file('../resources/data/sts-en-en/input.all2.txt')
@@ -27,3 +26,32 @@ ss = []
 ss = [s, s]
 for idx, [lemma, pos] in enumerate(s):
     print(idx, lemma, pos)
+
+
+from multiprocessing import Pool
+from multiprocessing import Process
+
+def f(x):
+    return x*x
+
+if __name__ == '__main__':
+    p = Pool(5)
+    print(p.map(f, [1, 2, 3]))
+
+
+class A:
+    def __init__(self):
+        pass
+
+    def square(self, x):
+        return x * x
+
+
+    def main(self, input):
+        for i in range(1000):
+            p = Process(target=self.square, args=(i,))
+            p.start()
+            p.join()
+
+a = A()
+a.main([1,2,3])

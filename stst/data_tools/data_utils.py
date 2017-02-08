@@ -7,8 +7,8 @@ import traceback
 import json
 import pyprind
 
-from stst.lib.pycorenlp.corenlp_utils import nlp
-from stst.data_tools.sentpair import SentPair
+from ..lib.pycorenlp.corenlp_utils import nlp
+from sent_pair import SentPair
 
 
 def load_data(train_file):
@@ -64,6 +64,9 @@ def load_parse_data(train_file, flag=False):
             except Exception:
                 print(sa, sb)
                 traceback.print_exc()
+                raise Exception('Check whether you have started the CoreNLP server e.g.\n'
+                                '$ cd stanford-corenlp-full-2015-12-09/ \n'
+                                '$ java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer')
             parse_data.append((parse_sa, parse_sb, score))
 
         ''' Write Data to File '''

@@ -1,9 +1,10 @@
-from features import Feature
 import nltk
 import numpy as np
 import pyjsonrpc
-import dict_utils
-import lib.kernel.vector_kernel as vk
+
+from .. import dict_utils
+from features import Feature
+from ..lib.kernel import vector_kernel as vk
 
 
 class Embedding(object):

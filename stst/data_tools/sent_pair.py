@@ -1,8 +1,9 @@
 # coding: utf8
 from __future__ import print_function
 
-import json, stst.data_tools
 from nltk.corpus import wordnet as wn
+
+import stst.data_tools
 from stst.dict_utils import DictLoader
 
 class SentPair(object):

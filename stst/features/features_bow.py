@@ -1,5 +1,7 @@
 from features import Feature
-from .. import utils, dict_utils
+from stst import dict_utils
+from .. import utils
+
 
 class BOWFeature(Feature):
     def __init__(self, stopwords=True, **kwargs):

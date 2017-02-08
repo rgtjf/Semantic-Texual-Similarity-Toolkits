@@ -11,11 +11,11 @@ from features_ngram import *
 from features_nn import *
 from features_pos import *
 from features_remove_nonlinear_kernel import *
-from features_sequence import *
 from features_tree_kernels import *
 
-from stst.model import Model
+from features_sequence import *
 from stst.main.main_tools import *
+from stst.model import Model
 
 
 def NER(train_instances):

@@ -3,11 +3,11 @@ from __future__ import print_function
 
 from features_embedding import *
 
+from stst.data_tools import data_utils
 from stst.evaluation import *
 from stst.features.features_ngram import *
 from stst.model import Model
 from stst.record import *
-from stst.data_tools import data_utils
 
 
 def make_model(model, train_parse_data, train_file, dev_parse_data, dev_file):

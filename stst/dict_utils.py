@@ -1,14 +1,15 @@
 # coding: utf8
 from __future__ import print_function
 
-from collections import defaultdict
-import math, numpy
-from numpy.linalg import norm
+import math
+
 import nltk.corpus
-import config, data_tools
 import pyprind
 
+import config
+import stst.data_tools
 import utils
+
 
 @utils.singleton
 class DictLoader(object):
@@ -101,7 +102,7 @@ class DictCreater(object):
             ''' write dict to file '''
 
             file_name = 'dict_' + func.__name__.replace("create_", "") + '.txt'
-            f_dict = data_tools.create_write_file(config.DICT_DIR + '/' + file_name)
+            f_dict = stst.data_tools.create_write_file(config.DICT_DIR + '/' + file_name)
 
             if type(ret) == list:
                 # ensure it is set

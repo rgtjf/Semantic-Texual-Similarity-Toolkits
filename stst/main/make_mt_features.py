@@ -1,8 +1,8 @@
 # coding: utf8
 from __future__ import print_function
 
-from stst.features.features_mt import *
 from main_tools import *
+from stst.features.features_mt import *
 from stst.model import Model
 
 

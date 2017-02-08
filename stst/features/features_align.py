@@ -1,10 +1,11 @@
 # coding: utf8
-import json, pyprind
+import json
+
+import pyprind
 
 from features import Feature
+from stst import utils
 from ..lib.word_aligner import aligner
-from .. import utils
-
 
 
 class AlignmentFeature(Feature):
@@ -40,18 +41,17 @@ class IdfAlignmentFeature(Feature):
 
         ''' get features from train instances'''
 
-        alignmentfeature_file = self.feature_file.replace('IdfAlignmentFeature', 'AlignmentFeature')
-        alignmentfeatures = utils.create_read_file(alignmentfeature_file).readlines()
+        alignment_feature_file = self.feature_file.replace('IdfAlignmentFeature', 'AlignmentFeature')
+        alignment_features = utils.create_read_file(alignment_feature_file).readlines()
 
         idf_weight = self.idf_weight
-        # idf_weight = dict_utils.DictLoader().load_dict('global_idf')
         default_idf_weight = min(idf_weight.values())
 
-        for train_instance, alignmentfeature in zip(train_instances, alignmentfeatures[1:]):
+        for train_instance, alignment_feature in zip(train_instances, alignment_features[1:]):
             process_bar.update()
 
-            alignmentfeature = alignmentfeature.split('\t#\t')[1]
-            myWordAlignments = json.loads(alignmentfeature)[0]  # list of [sa_idx, sb_idx] index start from 1
+            alignment_feature = alignment_feature.split('\t#\t')[1]
+            myWordAlignments = json.loads(alignment_feature)[0]  # list of [sa_idx, sb_idx] index start from 1
 
             word_sa, word_sb = train_instance.get_word(type='lemma', lower=True)
 
@@ -74,7 +74,6 @@ class IdfAlignmentFeature(Feature):
             sent2_ali = 0
             for idx, word in enumerate(word_sa):
                 weight = idf_weight.get(word, default_idf_weight)
-                # 10.0 is looked from dict_idf.txt, more often use minimum value as default
                 sent1_ali += sent1_aligned[idx] * weight
                 sent1_sum += weight
 
@@ -103,6 +102,7 @@ class PosAlignmentFeature(Feature):
             lemma_sa, lemma_sb = train_instance.get_word(type='lemma', lower=True)
             seqs.append(lemma_sa)
             seqs.append(lemma_sb)
+
         self.idf_weight = utils.IDFCalculator(seqs)
 
     def extract_instances(self, train_instances):
@@ -118,14 +118,14 @@ class PosAlignmentFeature(Feature):
 
         ''' get features from train instances'''
 
-        alignmentfeature_file = self.feature_file.replace('PosAlignmentFeature', 'AlignmentFeature')
-        alignmentfeatures = utils.create_read_file(alignmentfeature_file).readlines()
+        alignment_feature_file = self.feature_file.replace('PosAlignmentFeature', 'AlignmentFeature')
+        alignment_features = utils.create_read_file(alignment_feature_file).readlines()
 
-        for train_instance, alignmentfeature in zip(train_instances, alignmentfeatures[1:]):
+        for train_instance, alignment_feature in zip(train_instances, alignment_features[1:]):
             process_bar.update()
 
-            alignmentfeature = alignmentfeature.split('\t#\t')[1]
-            myWordAlignments = json.loads(alignmentfeature)[0]  # list of [sa_idx, sb_idx] index start from 1
+            alignment_feature = alignment_feature.split('\t#\t')[1]
+            myWordAlignments = json.loads(alignment_feature)[0]  # list of [sa_idx, sb_idx] index start from 1
             pos_sa, pos_sb = train_instance.get_pos_tag(stopwords=False)
             ner_sa, ner_sb = train_instance.get_word(type='ner', stopwords=False)
             word_sa, word_sb = train_instance.get_word(type='lemma', lower=True)

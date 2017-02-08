@@ -1,16 +1,20 @@
 # coding: utf8
 from __future__ import print_function
 
-import pyprind
-from features import Feature
-import time, os, config, utils
+import os
+import time
 import traceback
-from selenium import webdriver
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+
 import lxml.html
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+
+import utils
+from features import Feature
+from stst import config
 
 
 class AsiyaDriver(object):

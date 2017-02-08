@@ -1,6 +1,6 @@
 from features import Feature
+from stst import utils
 from ..lib.sentence_similarity.short_sentence_similarity import *
-from .. import utils
 
 
 class ShortSentenceFeature(Feature):
@@ -11,7 +11,7 @@ class ShortSentenceFeature(Feature):
         return features, infos
 
 
-class SentenceFeature(Feature):
+class LexicalFeature(Feature):
     def extract(self, train_instance):
         sa, sb = train_instance.get_preprocess()
         # sa, sb = train_instance.get_word(type='lemma', stopwords=True, lower=True)
@@ -20,8 +20,8 @@ class SentenceFeature(Feature):
         l = min(la, lb)
 
         features = []
-        # feature, info = utils.sequence_edit_distance_features(sa, sb)
-        # features += feature
+        feature, info = utils.sequence_edit_distance_features(sa, sb)
+        features += feature
 
         feature, info = utils.sequence_match_features(sa, sb)
         features += feature
@@ -32,4 +32,3 @@ class SentenceFeature(Feature):
 
         infos = [sa, sb]
         return features, infos
-

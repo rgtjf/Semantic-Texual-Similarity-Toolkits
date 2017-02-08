@@ -2,11 +2,12 @@
 from __future__ import print_function
 
 import time
-from functools import wraps
 import csv, nltk, math
 import codecs
+from functools import wraps
 from collections import Counter
-import stst.lib.kernel.vector_kernel as vk
+
+from lib.kernel import vector_kernel as vk
 
 
 def fn_timer(function):

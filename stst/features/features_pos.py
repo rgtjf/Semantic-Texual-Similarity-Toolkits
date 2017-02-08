@@ -1,10 +1,9 @@
 # coding: utf8
 from __future__ import print_function
 
-import lib.kernel.vector_kernel as vk
-import utils
 from features import Feature
-
+from .. import utils
+from ..lib.kernel import vector_kernel as vk
 
 class POSMatchFeature(Feature):
     def extract_information(self, train_instances):
@@ -79,13 +78,10 @@ class POSLemmaMatchFeature(Feature):
         return features, infos
 
 
-from features.features_embedding import minavgmaxpooling
 class POSNounEmbeddingFeature(Feature):
     def __init__(self, emb_type, dim, lower=True, **kwargs):
         super(POSNounEmbeddingFeature, self).__init__(**kwargs)
-
         self.lower = lower
-
         if 'emb_type' is None:
             print('please init with emb_type and dimension!')
             exit()
@@ -94,7 +90,8 @@ class POSNounEmbeddingFeature(Feature):
         self.feature_name = self.feature_name + '-%s' % (emb_type)
 
     def extract(self, train_instance):
-        lower = self.lower
+        from features_embedding import minavgmaxpooling
+
         emb_type = self.emb_type
         dim = self.dim
 
@@ -111,6 +108,7 @@ class POSNounEmbeddingFeature(Feature):
 
         infos = [sa, sb]
         return features, infos
+
 
 class POSNounEditFeature(Feature):
     def extract(self, train_instance):

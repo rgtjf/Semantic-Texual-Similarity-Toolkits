@@ -1,4 +1,4 @@
-from lib.word_aligner.aligner import *
+from stst.lib.word_aligner.aligner import *
 from lib.pycorenlp.coreNlpUtil import *
 
 sa = "Two green and white trains sitting on the tracks."

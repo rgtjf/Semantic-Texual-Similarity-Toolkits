@@ -5,20 +5,15 @@ from features_dependency import *
 from features_embedding import *
 from features_ngram import *
 from features_nn import *
+
 from features_sequence import *
 
-from stst.classifier import *
 # from features_pos import *
 # from features_ner import *
 # from features_remove_nonlinear_kernel import *
 # from evaluation import *
 # from record import *
-from stst.features.features_basic import *
 from stst.model import Model
-from stst.data_tools import *
-
-
-
 
 if __name__ == '__main__':
     rf50 = Classifier(RandomForest(n_estimators=50))
