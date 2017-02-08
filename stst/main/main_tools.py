@@ -1,9 +1,9 @@
 # coding: utf8
-import config, cparams
-import data_utils
-from record import *
-from evaluation import *
+import cparams
 
+from stst.evaluation import *
+from stst.record import *
+from stst.data_tools import data_utils
 
 
 def make_features(model):

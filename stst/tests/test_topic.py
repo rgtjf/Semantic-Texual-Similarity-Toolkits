@@ -14,9 +14,8 @@ from features_remove_nonlinear_kernel import *
 from features_sequence import *
 from features_tree_kernels import *
 
-from classifier import *
-from main_tools import *
-from model import Model
+from stst.model import Model
+from stst.main.main_tools import *
 
 
 def NER(train_instances):

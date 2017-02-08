@@ -11,28 +11,17 @@ from features_pos import *
 from features_sequence import *
 from features_tree_kernels import *
 
-from classifier import *
-from features.features_ngram import *
-from main_tools import *
-from model import Model
+from stst.features.features_ngram import *
+from stst.model import Model
+from stst.main.main_tools import *
 
 
 
 
 if __name__ == '__main__':
 
-    sklearn_gb = Classifier(sklearn_GB())
     rf = Classifier(RandomForest())
-    xgb = Classifier(XGBOOST())
-
-    avg = Classifier(AvgEnsembel())
-
-    en_model = Model('S3-combine', avg)
-
-    model_gb = Model('S1-gb', sklearn_gb)
-    model_rf = Model('S2-rf', rf)
-    model_xgb = Model('S1-xgb', xgb)
-    model = model_gb
+    model = Model('S2-rf', rf)
 
     model.add(nLemmaGramOverlapFeature())
     model.add(nWordGramOverlapFeature())
@@ -71,24 +60,10 @@ if __name__ == '__main__':
     model.add(MinAvgMaxEmbeddingFeature(emb_type='glove', dim=100, load=True))
     model.add(MinAvgMaxEmbeddingFeature(emb_type='glove300', dim=300, load=True))
 
-    model_rf.feature_list = model.feature_list
-    model_xgb.feature_list = model.feature_list
+    train_en(model)
+    test_en(model)
+    predict_en_sample(model)
 
-    en_model.add(model_rf)
-    en_model.add(model_gb)
-    en_model.add(model_xgb)
-
-    en_model.add(ICLRScoreFeature(nntype='word'))
-    en_model.add(ICLRScoreFeature(nntype='proj'))
-    en_model.add(ICLRScoreFeature(nntype='lstm'))
-    en_model.add(ICLRScoreFeature(nntype='dan'))
-
-    en_model.add(IdfAlignmentFeature())
-    en_model.add(EnNegativeFeature(penalty=0.6))
-
-    test_en(en_model)
-    predict_en_sample(en_model)
-
-    predict_en(en_model, dev_flag=False)
-    predict_snli(en_model, dev_flag=False)
-    predict_wmt(en_model, dev_flag=False)
+    predict_en(model, dev_flag=False)
+    predict_snli(model, dev_flag=False)
+    predict_wmt(model, dev_flag=False)

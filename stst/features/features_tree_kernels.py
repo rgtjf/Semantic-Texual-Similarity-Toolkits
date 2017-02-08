@@ -1,6 +1,6 @@
-import lib.kernel.tree as tree
-import lib.kernel.tree_kernels as tree_kernels
+from ..lib.kernel import tree, tree_kernels
 from features import Feature
+
 
 def get_all_tree_kernels(tree1, tree2):
 

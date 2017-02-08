@@ -1,6 +1,6 @@
 # coding: utf8
 from __future__ import print_function
-import config, utils
+import config, data_tools
 
 
 # f = utils.create_write_file('../resources/data/sts-en-en/input.all2.txt')

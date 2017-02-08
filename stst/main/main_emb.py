@@ -1,12 +1,11 @@
 # coding: utf8
 from __future__ import print_function
 
-import data_utils
-from classifier import *
-from evaluation import *
-from features.features_embedding import *
-from main import record
-from model import Model
+from stst.evaluation import *
+from stst.features.features_embedding import *
+from stst.main import record
+from stst.model import Model
+from stst.data_tools import data_utils
 
 def get_sim_model(dev_parse_data, dev_file, dev_gs):
     pass
@@ -112,9 +111,9 @@ if __name__ == '__main__':
     train_parse_data, dev_parse_data = data_utils.load_parse_data(train_file, train_gs, flag=False), \
                                        data_utils.load_parse_data(dev_file, dev_gs, flag=False)
 
-    import dict_utils
+    import stst.dict_utils
 
-    dict_utils.DictCreater().create_idf(train_parse_data + dev_parse_data)
+    stst.dict_utils.DictCreater().create_idf(train_parse_data + dev_parse_data)
 
     ''' Define a Model'''
 

@@ -1,23 +1,5 @@
-import config,data_utils
-
-def parse_files():
-    # TEST_FILE = TEST_DIR + '/sts-en-es/googleapi/STS.googleapi.news.txt'
-    # TEST_GS_FILE = TEST_DIR + '/sts-en-es/STS.gs.news.txt'
-
-    test_files = config.TEST_FILES
-    for task in test_files:
-        for corpus in test_files[task]:
-            translators = ['googleapi', 'microsoftapi']
-            if 'ar' in task:
-                translators.append('manual')
-            if 'en-en' in task:
-                translators = ['manual']
-            for translator in translators:
-                dev_file = config.TEST_DIR + '/' + task + '/' + translator + '/' \
-                           + corpus.replace('input', translator.replace('microsoftapi', 'msapi'))
-                dev_gs_file = config.TEST_DIR + '/' + task + '/' + corpus
-                dev_gs_file = dev_gs_file.replace('input', 'gs')
-                dev_parse_data = data_utils.load_parse_data(dev_file, dev_gs_file, flag=True)
+import stst.config
+from stst.data_tools import data_utils
 
 
 def get_all_instance(file_list, type='lemma'):
@@ -52,50 +34,50 @@ def get_sts_file_list():
     file_list = []
 
     # train_file
-    train_file = config.TRAIN_FILE
+    train_file = stst.config.TRAIN_FILE
     file_list.append(train_file)
 
     # sts-en-en
     task = 'sts-en-en'
-    test_files = config.TEST_FILES['sts-en-en']
+    test_files = stst.config.TEST_FILES['sts-en-en']
     translator = 'manual'
 
     for corpus in test_files:
-        dev_file = config.TEST_DIR + '/' + task + '/' + translator + '/' + corpus.replace('input', translator.replace(
+        dev_file = stst.config.TEST_DIR + '/' + task + '/' + translator + '/' + corpus.replace('input', translator.replace(
         'microsoftapi', 'msapi'))
         file_list.append(dev_file)
 
     # STS2017.eval-sample
     task = 'STS2017.eval'
     translator = 'manual'
-    test_files = config.TEST_FILES['STS2017.eval-sample']
+    test_files = stst.config.TEST_FILES['STS2017.eval-sample']
     for corpus in test_files:
-        dev_file = config.TEST_DIR + '/' + task + '/' + translator + '/' + corpus.replace('input', translator.replace(
+        dev_file = stst.config.TEST_DIR + '/' + task + '/' + translator + '/' + corpus.replace('input', translator.replace(
             'microsoftapi', 'msapi'))
         file_list.append(dev_file)
 
     #
     task = 'STS2017.eval'
     translator = 'manual'
-    test_files = config.TEST_FILES['STS2017.eval-en']
+    test_files = stst.config.TEST_FILES['STS2017.eval-en']
     for corpus in test_files:
-        dev_file = config.TEST_DIR + '/' + task + '/' \
+        dev_file = stst.config.TEST_DIR + '/' + task + '/' \
                    + translator + '/' + corpus.replace('input',translator.replace('microsoftapi', 'msapi'))
         file_list.append(dev_file)
 
     task = 'STS2017.eval'
     translator = 'googleapi'
-    test_files = config.TEST_FILES['STS2017.eval-snli']
+    test_files = stst.config.TEST_FILES['STS2017.eval-snli']
     for corpus in test_files:
-        dev_file = config.TEST_DIR + '/' + task + '/' \
+        dev_file = stst.config.TEST_DIR + '/' + task + '/' \
                    + translator + '/' + corpus.replace('input', translator.replace('microsoftapi', 'msapi'))
         file_list.append(dev_file)
 
     task = 'STS2017.eval'
     translator = 'googleapi_v2'
-    test_files = config.TEST_FILES['STS2017.eval-wmt']
+    test_files = stst.config.TEST_FILES['STS2017.eval-wmt']
     for corpus in test_files:
-        dev_file = config.TEST_DIR + '/' + task + '/' \
+        dev_file = stst.config.TEST_DIR + '/' + task + '/' \
                    + translator + '/' + corpus.replace('input', translator.replace('microsoftapi', 'msapi'))
         file_list.append(dev_file)
 
@@ -109,20 +91,20 @@ def get_wmt_file_list():
     file_list = []
 
     task = 'sts-en-es'
-    test_files = config.TEST_WMT_FILES['sts-en-es']
+    test_files = stst.config.TEST_WMT_FILES['sts-en-es']
     translator = 'googleapi_v2'
 
     for corpus in test_files:
-        dev_file = config.TEST_DIR + '/' + task + '/' + translator + '/' + corpus.replace('input', translator.replace(
+        dev_file = stst.config.TEST_DIR + '/' + task + '/' + translator + '/' + corpus.replace('input', translator.replace(
         'microsoftapi', 'msapi'))
         file_list.append(dev_file)
 
 
     task = 'STS2017.eval'
     translator = 'googleapi_v2'
-    test_files = config.TEST_FILES['STS2017.eval-wmt']
+    test_files = stst.config.TEST_FILES['STS2017.eval-wmt']
     for corpus in test_files:
-        dev_file = config.TEST_DIR + '/' + task + '/' \
+        dev_file = stst.config.TEST_DIR + '/' + task + '/' \
                    + translator + '/' + corpus.replace('input', translator.replace('microsoftapi', 'msapi'))
         file_list.append(dev_file)
 

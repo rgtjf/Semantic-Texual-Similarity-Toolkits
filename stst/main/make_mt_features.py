@@ -1,10 +1,9 @@
 # coding: utf8
 from __future__ import print_function
 
-from classifier import *
-from features.features_mt import *
+from stst.features.features_mt import *
 from main_tools import *
-from model import Model
+from stst.model import Model
 
 
 def NER(train_instances):

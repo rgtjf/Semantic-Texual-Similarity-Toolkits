@@ -1,18 +1,16 @@
 # coding: utf8
 from __future__ import print_function
 
-from utils import singleton
-from lib.utils_topic import *
-
 from collections import defaultdict
 import math, numpy
 from numpy.linalg import norm
 import nltk.corpus
-import config, utils
+import config, data_tools
 import pyprind
 
+import utils
 
-@singleton
+@utils.singleton
 class DictLoader(object):
     def __init__(self):
         self.dict_manager = {}
@@ -44,10 +42,6 @@ class DictLoader(object):
             self.dict_manager[dict_name] = dict_object
 
         return self.dict_manager[dict_name]
-
-    def load_ex_dict(self, dict_name, path=config.EX_DICT_DIR):
-
-        return self.load_dict(dict_name, path=path)
 
     def load_doc2vec(self):
         dict_name = 'doc2vec'
@@ -82,34 +76,6 @@ class DictLoader(object):
         return self.dict_manager[dict_name]
 
 
-# dict_loader().load_puncts()
-
-
-#
-# dictionary = {}
-# self._create_dict(self.train_parse_dict, self.train_explicitRelations, dict_function, dictionary)
-# self._create_dict(self.dev_parse_dict, self.dev_explicitRelations, dict_function, dictionary)
-#
-# # 删除频率小于threshold的键
-# util.removeItemsInDict(dictionary, threshold)
-# # 字典keys写入文件
-# util.write_dict_keys_to_file(dictionary, dict_path)
-
-
-# def _create_dict(self, parse_dict, explicitRelations, dict_function, dictionary):
-#     process_bar = pyprind.ProgPercent(len(explicitRelations))
-#     for explicitRelation in explicitRelations:
-#         process_bar.update()
-#
-#         result = dict_function(parse_dict, explicitRelation)
-#
-#         if type(result) == list:
-#             for item in result:
-#                 util.set_dict_key_value(dictionary, item)
-#         else:
-#             util.set_dict_key_value(dictionary, result)
-
-
 class DictCreater(object):
     def __init__(self):
         pass
@@ -135,7 +101,7 @@ class DictCreater(object):
             ''' write dict to file '''
 
             file_name = 'dict_' + func.__name__.replace("create_", "") + '.txt'
-            f_dict = utils.create_write_file(config.DICT_DIR + '/' + file_name)
+            f_dict = data_tools.create_write_file(config.DICT_DIR + '/' + file_name)
 
             if type(ret) == list:
                 # ensure it is set
@@ -177,30 +143,6 @@ class DictCreater(object):
 
 
     @_create_dict
-    def create_corpus_idf(self):
-
-        word_frequencies = {}
-
-        file_name = config.EX_DICT_DIR + '/word-frequencies.txt'
-        print('load dict from file %s \n' % file_name)
-
-        f_dict = utils.create_read_file(file_name)
-
-        for idx, line in enumerate(f_dict):
-            if idx == 0:
-                totfreq = int(line)
-            else:
-                w, freq = line.strip().split()
-                # print(w, freq)
-                freq = float(freq)
-                if freq < 10:
-                    continue
-                word_frequencies[w] = math.log(totfreq / freq) / math.log(2)
-
-        return word_frequencies
-
-
-    @_create_dict
     def create_idf(self, train_instances, min_cnt=3):
 
         process_bar = pyprind.ProgPercent(len(train_instances))
@@ -229,28 +171,6 @@ class DictCreater(object):
             idf_dict[key] = math.log(float(doc_num) / float(idf_dict[key])) / math.log(2.)
 
         return idf_dict
-
-    @_create_dict
-    def create_topic(self, sentences):
-
-        w2v_file = '/home/junfeng/word2vec/GoogleNews-vectors-negative300.bin'
-        model = Word2Vec.load_word2vec_format(w2v_file, binary=True)
-
-        vocab = []
-        for sentence in sentences:
-            for word in sentence:
-                vocab.append(word)
-
-        vocab = list(set(vocab))
-        vocab = [w for w in vocab if w in model.vocab]
-        topic_number = 4096
-
-        print('=====> kmeans cluster')
-        X = [model[w] for w in vocab]
-        labels, centers = kmeans_cluster(X, topic_number)
-
-        topic_dict = sorted(zip(vocab, labels), key=lambda x: (x[1], x[0]))
-        return topic_dict
 
     @_create_dict
     def create_global_idf(self):

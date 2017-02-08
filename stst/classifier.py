@@ -6,7 +6,7 @@ import pickle
 import time
 
 import config
-import utils
+import data_tools
 
 from numpy import shape
 from sklearn import neighbors
@@ -92,7 +92,7 @@ class RandomForestRegression(Strategy):
         y_pred = clf.predict(X_test_minmax.toarray())
 
         print("==> Save the result ...")
-        with utils.create_write_file(result_file_path) as f:
+        with data_tools.create_write_file(result_file_path) as f:
             for y in y_pred:
                 print(y, file=f)
         return y_pred
@@ -141,7 +141,7 @@ class GradientBoostingRegression(Strategy):
         y_pred = clf.predict(X_test_minmax.toarray())
 
         print("==> Save the result ...")
-        with utils.create_write_file(result_file_path) as f:
+        with data_tools.create_write_file(result_file_path) as f:
             for y in y_pred:
                 print(y, file=f)
         return y_pred
@@ -171,7 +171,7 @@ class AverageEnsemble(Strategy):
             y_pred.append(x)
 
         print("==> Save the result ...")
-        with utils.create_write_file(result_file_path) as f:
+        with data_tools.create_write_file(result_file_path) as f:
             for y in y_pred:
                 print(y, file=f)
         return y_pred

@@ -11,10 +11,9 @@ from features_pos import *
 from features_sequence import *
 from features_tree_kernels import *
 
-from classifier import *
-from features.features_ngram import *
-from main_tools import *
-from model import Model
+from stst.features.features_ngram import *
+from stst.model import Model
+from stst.main.main_tools import *
 
 
 
@@ -22,22 +21,8 @@ from model import Model
 if __name__ == '__main__':
 
     sklearn_gb = Classifier(sklearn_GB())
-    rf = Classifier(RandomForest())
-    xgb = Classifier(XGBOOST())
-
-    liblinearsvr = Classifier(LIB_LINEAR_SVR())
-    sklearn_svr = Classifier(sklearn_SVR())
-    model_sk_svr = Model('s1-svr', sklearn_svr)
-
-    avg = Classifier(AvgEnsembel())
-
-    en_model = Model('S6-combine2', avg)
-    en_model_final = Model('S6-combine2-mt', avg)
-
-    model_gb = Model('s1-gb', sklearn_gb)
-    model_rf = Model('S4-rf', rf)
-    model_xgb = Model('s1-xgb', xgb)
-    model = model_rf
+    model_gb = Model('S1-gb', sklearn_gb)
+    model = model_gb
 
     model.add(nLemmaGramOverlapFeature())
     model.add(nWordGramOverlapFeature())
@@ -48,15 +33,13 @@ if __name__ == '__main__':
     model.add(nLemmaGramOverlapMatchFeature())
     model.add(nLemmaGramOverlapBeforeStopwordsMatchFeature())
 
-    model.add(AsiyaEsEsMTFeature())
     model.add(AsiyaMTFeature())
     model.add(SequenceFeature())
     model.add(BOWFeature(stopwords=False))
     model.add(Doc2VecGlobalFeature())
-    # model.add(Doc2VecFeature())
 
     model.add(AlignmentFeature())
-    # model.add(IdfAlignmentFeature())  # 放在前面特征里面容易拟合这个特征
+    model.add(IdfAlignmentFeature())  # 放在前面特征里面容易拟合这个特征
     model.add(PosAlignmentFeature())
 
     model.add(DependencyRelationFeature(convey='idf'))
@@ -78,41 +61,10 @@ if __name__ == '__main__':
     model.add(MinAvgMaxEmbeddingFeature(emb_type='glove', dim=100, load=True))
     model.add(MinAvgMaxEmbeddingFeature(emb_type='glove300', dim=300, load=True))
 
-    model_rf.feature_list = model.feature_list
-    model_xgb.feature_list = model.feature_list
+    train_en(model)
+    test_en(model)
+    predict_en_sample(model)
 
-    en_model.add(model_rf)
-    en_model.add(model_rf)
-    # en_model.add(model_gb)
-    en_model.add(model_xgb)
-
-    # train_en(model_gb)
-    # train_en(model_rf)
-    # train_en(model_xgb)
-
-    en_model.add(ICLRScoreFeature(nntype='word'))
-    en_model.add(ICLRScoreFeature(nntype='proj'))
-    en_model.add(ICLRScoreFeature(nntype='lstm'))
-    en_model.add(ICLRScoreFeature(nntype='dan'))
-
-    en_model.add(IdfAlignmentFeature())
-    en_model.add(EnNegativeFeature(penalty=0.6))
-
-    # test_wmt(model_gb)
-    # cv_test_wmt(model_gb)
-    # cv_test_wmt(model_xgb)
-    # cv_test_wmt(model_rf)
-
-    model_avg = Model('es-mt-avg', avg)
-    model_avg.add(AsiyaEsEsMTFeature())
-    en_model_final.add(model_avg)
-    en_model_final.add(en_model)
-    # train_wmt(model_xgb)
-    # # train_wmt(model_avg)
-    # en_model.add(model_avg)
-
-    # cv_test_wmt(en_model)
-
-
-    # train_wmt(model_rf)
-    predict_wmt(en_model_final, dev_flag=False)
+    predict_en(model, dev_flag=False)
+    predict_snli(model, dev_flag=False)
+    predict_wmt(model, dev_flag=False)

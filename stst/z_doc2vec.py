@@ -1,11 +1,9 @@
 # coding: utf8
-from features import Feature
 from gensim.models import Doc2Vec
-
 from gensim.models.doc2vec import TaggedDocument
 
-import config, data_utils
-
+import config
+from stst.data_tools import data_utils
 
 train_file = config.TRAIN_FILE
 train_gs = config.TRAIN_GS_FILE

@@ -1,10 +1,9 @@
 # coding: utf8
-
 from __future__ import print_function
 
-import json, utils
+import json, stst.data_tools
 from nltk.corpus import wordnet as wn
-from dict_utils import DictLoader
+from stst.dict_utils import DictLoader
 
 class SentPair(object):
     def __init__(self, parse_json):
@@ -27,8 +26,8 @@ class SentPair(object):
             word_sa, word_sb = self.get_word(type='lemma', stopwords=False, lower=True)
             pos_sa, pos_sb = self.get_word(type='pos', stopwords=False)
 
-        pos_sa = map(utils.get_tag, pos_sa)
-        pos_sb = map(utils.get_tag, pos_sb)
+        pos_sa = map(stst.data_tools.get_tag, pos_sa)
+        pos_sb = map(stst.data_tools.get_tag, pos_sb)
         # pos_sa, pos_sb = self.get_pos_tag(stopwords=False, lower=True)
         pos_sa = zip(word_sa, pos_sa)
         pos_sb = zip(word_sb, pos_sb)
@@ -135,18 +134,18 @@ class SentPair(object):
     def get_pos_tag(self, stopwords=True):
         if stopwords:
             tokens = self.parse_sa["sentences"][0]["tokens"]
-            pos_sa = [[token['lemma'], utils.get_tag(token['pos'])] for token in tokens if
+            pos_sa = [[token['lemma'], stst.data_tools.get_tag(token['pos'])] for token in tokens if
                       token['word'].lower() not in DictLoader().load_dict('stopwords')]
 
             tokens = self.parse_sb["sentences"][0]["tokens"]
-            pos_sb = [[token['lemma'], utils.get_tag(token['pos'])] for token in tokens if
+            pos_sb = [[token['lemma'], stst.data_tools.get_tag(token['pos'])] for token in tokens if
                       token['word'].lower() not in DictLoader().load_dict('stopwords')]
         else:
             tokens = self.parse_sa["sentences"][0]["tokens"]
-            pos_sa = [[token['lemma'], utils.get_tag(token['pos'])] for token in tokens ]
+            pos_sa = [[token['lemma'], stst.data_tools.get_tag(token['pos'])] for token in tokens]
 
             tokens = self.parse_sb["sentences"][0]["tokens"]
-            pos_sb = [[token['lemma'], utils.get_tag(token['pos'])] for token in tokens]
+            pos_sb = [[token['lemma'], stst.data_tools.get_tag(token['pos'])] for token in tokens]
 
         return pos_sa, pos_sb
 

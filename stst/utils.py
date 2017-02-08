@@ -6,7 +6,7 @@ from functools import wraps
 import csv, nltk, math
 import codecs
 from collections import Counter
-import lib.kernel.vector_kernel as vk
+import stst.lib.kernel.vector_kernel as vk
 
 
 def fn_timer(function):

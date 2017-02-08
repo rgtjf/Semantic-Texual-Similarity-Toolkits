@@ -1,16 +1,9 @@
 # coding: utf8
-from features import Feature
-from lib.word_aligner import aligner
-
-import codecs, utils
-from collections import Counter
-import config, utils
 import json, pyprind
-import dict_utils
-import numpy as np
-import nltk
-import os
 
+from features import Feature
+from ..lib.word_aligner import aligner
+from .. import utils
 
 
 

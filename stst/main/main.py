@@ -3,12 +3,11 @@ from __future__ import print_function
 
 from features_embedding import *
 
-import data_utils
-from classifier import *
-from evaluation import *
-from features.features_ngram import *
-from model import Model
-from record import *
+from stst.evaluation import *
+from stst.features.features_ngram import *
+from stst.model import Model
+from stst.record import *
+from stst.data_tools import data_utils
 
 
 def make_model(model, train_parse_data, train_file, dev_parse_data, dev_file):
@@ -76,9 +75,9 @@ if __name__ == '__main__':
     dev_parse_data = data_utils.load_parse_data(dev_file, dev_gs, flag=False)
     ''' Build Dict Object '''
     # create Vocab and calculate idf dict
-    import dict_utils
+    import stst.dict_utils
 
-    dict_utils.DictCreater().create_idf(train_parse_data)
+    stst.dict_utils.DictCreater().create_idf(train_parse_data)
 
     ''' Define a Model'''
 

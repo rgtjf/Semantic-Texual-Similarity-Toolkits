@@ -1,7 +1,6 @@
 # coding: utf8
 from __future__ import print_function
 
-from features.features_mt import *
 from main_tools import *
 
 

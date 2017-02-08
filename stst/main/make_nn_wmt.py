@@ -7,15 +7,15 @@ from features_ngram import *
 from features_nn import *
 from features_sequence import *
 
-from classifier import *
+from stst.classifier import *
 # from features_pos import *
 # from features_ner import *
 # from features_remove_nonlinear_kernel import *
 # from evaluation import *
 # from record import *
-from features.features_basic import *
-from model import Model
-from data_tools import *
+from stst.features.features_basic import *
+from stst.model import Model
+from stst.data_tools import *
 
 
 

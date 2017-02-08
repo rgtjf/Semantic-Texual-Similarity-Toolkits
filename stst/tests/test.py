@@ -11,10 +11,9 @@ from features_pos import *
 from features_sequence import *
 from features_tree_kernels import *
 
-from classifier import *
-from features.features_ngram import *
-from main_tools import *
-from model import Model
+from stst.features.features_ngram import *
+from stst.model import Model
+from stst.main.main_tools import *
 
 
 
