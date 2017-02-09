@@ -1,7 +1,3 @@
-# data
-./data/*
-./generate/*
-
 # pycharm
 .idea/
 
@@ -94,3 +90,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+/generate/
+/parse/
+/data/
