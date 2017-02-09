@@ -9,6 +9,14 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 
 import utils
 
+__all__ = [
+    "Strategy",
+    "Classifier",
+    "RandomForestRegression",
+    "GradientBoostingRegression",
+    "AverageEnsemble"
+]
+
 
 class Strategy(object):
     def train_model(self, train_file_path, model_path):
@@ -17,7 +25,7 @@ class Strategy(object):
     def test_model(self, test_file_path, model_path, result_file_path):
         return None
 
-    def __load_file(self, file_path):
+    def load_file(self, file_path):
         data = load_svmlight_file(file_path)
         return data[0], data[1]
 
@@ -33,15 +41,6 @@ class Classifier(object):
         return self.strategy.test_model(test_file_path, model_path, result_file_path)
 
 
-__all__ = [
-    "Strategy",
-    "Classifier",
-    "RandomForestRegression",
-    "GradientBoostingRegression",
-    "AverageEnsemble"
-]
-
-
 class RandomForestRegression(Strategy):
     """
     RandomForest Regression
@@ -54,7 +53,7 @@ class RandomForestRegression(Strategy):
 
     def train_model(self, train_file_path, model_path):
         print("==> Load the data ...")
-        X_train, Y_train = self.__load_file(train_file_path)
+        X_train, Y_train = self.load_file(train_file_path)
         print(train_file_path, shape(X_train))
 
         print("==> Train the model ...")
@@ -66,18 +65,18 @@ class RandomForestRegression(Strategy):
         print("==> Save the model ...")
         pickle.dump(clf, open(model_path, 'wb'))
 
-        scaler_path = model_path.replace('.txt', '.scaler.pkl')
+        scaler_path = model_path.replace('.pkl', '.scaler.pkl')
         pickle.dump(min_max_scaler, open(scaler_path, 'wb'))
         return clf
 
     def test_model(self, test_file_path, model_path, result_file_path):
         print("==> Load the data ...")
-        X_test, Y_test = self.__load_file(test_file_path)
+        X_test, Y_test = self.load_file(test_file_path)
         print(test_file_path, shape(X_test))
 
         print("==> Load the model ...")
         clf = pickle.load(open(model_path, 'rb'))
-        scaler_path = model_path.replace('.txt', '.scaler.pkl')
+        scaler_path = model_path.replace('.pkl', '.scaler.pkl')
         min_max_scaler = pickle.load(open(scaler_path, 'rb'))
 
         print("==> Test the model ...")
@@ -102,7 +101,7 @@ class GradientBoostingRegression(Strategy):
 
     def train_model(self, train_file_path, model_path):
         print("==> Load the data ...")
-        X_train, Y_train = self.__load_file(train_file_path)
+        X_train, Y_train = self.load_file(train_file_path)
         print(train_file_path, shape(X_train))
 
         print("==> Train the model ...")
@@ -115,18 +114,18 @@ class GradientBoostingRegression(Strategy):
         print("==> Save the model ...")
         pickle.dump(clf, open(model_path, 'wb'))
 
-        scaler_path = model_path.replace('.txt', '.scaler.pkl')
+        scaler_path = model_path.replace('.pkl', '.scaler.pkl')
         pickle.dump(min_max_scaler, open(scaler_path, 'wb'))
         return clf
 
     def test_model(self, test_file_path, model_path, result_file_path):
         print("==> Load the data ...")
-        X_test, Y_test = self.__load_file(test_file_path)
+        X_test, Y_test = self.load_file(test_file_path)
         print(test_file_path, shape(X_test))
 
         print("==> Load the model ...")
         clf = pickle.load(open(model_path, 'rb'))
-        scaler_path = model_path.replace('.txt', '.scaler.pkl')
+        scaler_path = model_path.replace('.pkl', '.scaler.pkl')
         min_max_scaler = pickle.load(open(scaler_path, 'rb'))
 
         print("==> Test the model ...")
@@ -151,7 +150,7 @@ class AverageEnsemble(Strategy):
 
     def test_model(self, test_file_path, model_path, result_file_path):
         print("==> Load the data ...")
-        X_test, Y_test = self.__load_file(test_file_path)
+        X_test, Y_test = self.load_file(test_file_path)
         print(test_file_path, shape(X_test))
         X_test = X_test.toarray()
         for x in X_test[:10]:

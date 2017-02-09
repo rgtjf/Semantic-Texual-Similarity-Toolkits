@@ -1,7 +1,7 @@
 # coding: utf8
 from __future__ import print_function
 
-import random
+import random, os
 
 import config
 import utils
@@ -20,13 +20,14 @@ class Model(object):
 
         self.feature_list = []
 
-        self.train_feature_file = config.FEATURE_DIR + '/' + self.model_name + '.train.txt'
-        self.dev_feature_file = config.FEATURE_DIR + '/' + self.model_name + '.dev.txt'
+        self.train_feature_file = config.MODEL_DIR + '/' + self.model_name + '.feature.train.txt'
+        self.dev_feature_file = config.MODEL_DIR + '/' + self.model_name + '.feature.dev.txt'
 
-        self.model_file = config.MODEL_DIR + '/' + self.model_name + '.txt'
+        self.model_file = config.MODEL_DIR + '/' + self.model_name + '.pkl'
 
         self.output_file = None  # config.OUTPUT_DIR + '/' + self.model_name + '.output.txt'
-        self.get_output_file = lambda train_file: train_file.replace('resources/data/', 'outputs/'+self.model_name+'/')
+
+        self.get_output_file = lambda train_file: config.OUTPUT_DIR + '/' + self.model_name + '/' + os.path.basename(train_file)
 
 
     def add(self, feature):
@@ -69,6 +70,7 @@ class Model(object):
         self.make_feature_file(dev_instances, dev_file, dev=True)
 
         self.output_file = self.get_output_file(dev_file)
+        print(self.output_file)
 
         ''' 2. Predict Answers '''
         predict_label = self.classifier.test_model(self.dev_feature_file, self.model_file, self.output_file)

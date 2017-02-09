@@ -1,15 +1,11 @@
 # coding: utf8
 from __future__ import print_function
 
+
 from collections import Counter
 
-import dict_utils
-import nltk
-import numpy as np
-from nltk.corpus import brown
-from nltk.corpus import wordnet
-
 from features import Feature
+from .. import dict_utils
 
 
 class nLemmaGramOverlapFeature(Feature):

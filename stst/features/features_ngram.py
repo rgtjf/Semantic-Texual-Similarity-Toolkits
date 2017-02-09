@@ -1,7 +1,9 @@
 # coding: utf8
-from features import Feature
+
 from collections import Counter
-import dict_utils
+
+from features import Feature
+from .. import dict_utils
 
 
 def match_features(match, len_sa, len_sb):

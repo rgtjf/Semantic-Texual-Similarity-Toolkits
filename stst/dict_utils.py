@@ -1,13 +1,11 @@
 # coding: utf8
 from __future__ import print_function
 
-import math
-
+import math, os
 import nltk.corpus
 import pyprind
 
 import config
-import stst.data_tools
 import utils
 
 
@@ -24,6 +22,9 @@ class DictLoader(object):
         if dict_name not in self.dict_manager:
 
             dict_object = {}
+
+            cur_dir = os.path.dirname(__file__)
+            path = os.path.join(cur_dir, 'resources')
 
             ''' load dict from file '''
             file_name = path + '/dict_%s.txt' % dict_name
@@ -102,7 +103,7 @@ class DictCreater(object):
             ''' write dict to file '''
 
             file_name = 'dict_' + func.__name__.replace("create_", "") + '.txt'
-            f_dict = stst.data_tools.create_write_file(config.DICT_DIR + '/' + file_name)
+            f_dict = utils.create_write_file(config.DICT_DIR + '/' + file_name)
 
             if type(ret) == list:
                 # ensure it is set

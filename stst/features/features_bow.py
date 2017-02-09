@@ -1,5 +1,5 @@
 from features import Feature
-from stst import dict_utils
+from .. import dict_utils
 from .. import utils
 
 

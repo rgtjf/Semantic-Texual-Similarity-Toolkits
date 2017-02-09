@@ -1,6 +1,6 @@
 # data
-./data/sts-en-en/input.all.txt
 ./data/*
+./generate/*
 
 # pycharm
 .idea/

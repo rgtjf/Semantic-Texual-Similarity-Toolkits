@@ -8,6 +8,7 @@ import json
 import pyprind
 
 from ..lib.pycorenlp.corenlp_utils import nlp
+from .. import utils
 from sent_pair import SentPair
 
 
@@ -70,7 +71,7 @@ def load_parse_data(train_file, flag=False):
             parse_data.append((parse_sa, parse_sb, score))
 
         ''' Write Data to File '''
-        with codecs.open(parse_train_file, 'r', encoding='utf8') as f_parse:
+        with utils.create_write_file(parse_train_file) as f_parse:
             for parse_instance in parse_data:
                 line = json.dumps(parse_instance)
                 print(line, file=f_parse)

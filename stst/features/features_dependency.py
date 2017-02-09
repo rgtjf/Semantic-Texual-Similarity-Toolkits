@@ -1,5 +1,5 @@
 from features import Feature
-from stst import utils
+from .. import utils
 
 
 class DependencyGramFeature(Feature):

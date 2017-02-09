@@ -4,7 +4,7 @@ from __future__ import print_function
 import json, pyprind
 import os
 
-from .. import utils
+from .. import utils, config
 
 class Feature(object):
     def __init__(self,
@@ -26,8 +26,9 @@ class Feature(object):
         self.train_file = train_file
 
         # Re-define self.feature_file to prevent self.feature_file change two times (i.e., train and test)
-        self.feature_file = train_file.replace('resources/data/', 'features/')
-        self.feature_file = self.feature_file.replace('.txt', '/' + self.feature_name + '.txt')
+        train_file_name = os.path.basename(train_file)
+        train_file_name = os.path.splitext(train_file_name)[0]
+        self.feature_file = config.FEATURE_DIR + '/' + train_file_name + '/' + self.feature_name + '.txt'
 
         return self.load_instances(train_instances)
 

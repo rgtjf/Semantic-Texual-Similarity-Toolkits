@@ -5,6 +5,7 @@ from features import Feature
 from .. import utils
 from ..lib.kernel import vector_kernel as vk
 
+
 class POSMatchFeature(Feature):
     def extract_information(self, train_instances):
         pass

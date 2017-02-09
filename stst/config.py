@@ -14,19 +14,19 @@
 #                   'STS2016.input.postediting.txt', 'STS2016.input.question-question.txt']
 # }
 #
-GENERATE = '../generate'
+GENERATE_DIR = '../generate'
 
 ''' result out '''
-OUTPUT_DIR = GENERATE + '/outputs'
+OUTPUT_DIR = GENERATE_DIR + '/outputs'
 
 ''' feature config '''
-FEATURE_DIR = GENERATE + '/features'
+FEATURE_DIR = GENERATE_DIR + '/features'
 
 ''' model config '''
-MODEL_DIR = GENERATE + '/models'
+MODEL_DIR = GENERATE_DIR + '/models'
 
 ''' record config '''
-RECORD_DIR = GENERATE + '/records'
+RECORD_DIR = GENERATE_DIR + '/records'
 
 
 RESOURCE = 'resources'
