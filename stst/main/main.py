@@ -1,8 +1,6 @@
 # coding: utf8
 from __future__ import print_function
 
-from features_embedding import *
-
 from stst.data_tools import data_utils
 from stst.evaluation import *
 from stst.features.features_ngram import *
