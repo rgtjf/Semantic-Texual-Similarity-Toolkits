@@ -1,5 +1,5 @@
 from features import Feature
-from stst import utils
+from .. import utils
 from ..lib.sentence_similarity.short_sentence_similarity import *
 
 

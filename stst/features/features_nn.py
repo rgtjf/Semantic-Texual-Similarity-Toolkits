@@ -1,14 +1,13 @@
 # coding: utf8
 import json
 
-import dict_utils
-import lib.kernel.vector_kernel as vk
 from gensim.models import Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
 
-import utils
 from features import Feature
-from stst import config
+from .. import config, utils, dict_utils
+from ..lib.kernel import vector_kernel as vk
+
 
 """
 1. 每个文档自己训练一个Doc2Vec

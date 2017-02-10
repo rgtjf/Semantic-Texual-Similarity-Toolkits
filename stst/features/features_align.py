@@ -4,7 +4,7 @@ import json
 import pyprind
 
 from features import Feature
-from stst import utils
+from .. import utils
 from ..lib.word_aligner import aligner
 
 

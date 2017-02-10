@@ -4,7 +4,7 @@ from setuptools import find_packages
 setup(
     name='stst',
     packages=find_packages(),
-    version='0.1.1',
+    version='0.1.3',
     description='stst',
     author='rgtjf',
     author_email='rgtjf1@163.com',
@@ -18,5 +18,6 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2.7',
-    ]
+    ],
+    install_requires = ['pyprind', 'python-jsonrpc', 'gensim', 'selenium']
 )
