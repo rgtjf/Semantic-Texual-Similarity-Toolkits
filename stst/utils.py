@@ -127,6 +127,13 @@ def overlap_f1(seq1, seq2):
     return f1
 
 
+def ngram_match(seq1, seq2, n):
+    nga = make_ngram(seq1, n)
+    ngb = make_ngram(seq2, n)
+    f1 = overlap_f1(nga, ngb)
+    return f1
+
+
 # vocab_idx_map: word and index mapping, e.g., egg=1
 def Vectorize(vocab_idx_map, idf_dict, list_of_word):
     vec = [float(0)] * len(idf_dict.keys())

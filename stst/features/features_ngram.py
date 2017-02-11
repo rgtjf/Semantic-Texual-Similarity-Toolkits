@@ -1,4 +1,5 @@
 # coding: utf8
+from __future__ import print_function
 
 from collections import Counter
 
@@ -6,173 +7,152 @@ from stst.features.features import Feature
 from stst import dict_utils, utils
 
 
-def match_features(match, len_sa, len_sb):
-    p, r, f1 = 0., 0., 1.
-    if len_sa > 0 and len_sb > 0:
-        p = match / float(len_sa)
-        r = match / float(len_sb)
-        f1 = 2 * p * r / (p + r) if p + r > 0 else 0.
-    return [f1] # [p, r, f1]
+class nGramOverlapFeature(Feature):
 
+    def __init__(self, type, **kwargs):
+        """
+        :param type: word or lemma
+        """
+        super(nGramOverlapFeature, self).__init__(**kwargs)
+        self.type = type
+        self.feature_name = self.feature_name + '-%s'%type
 
-def ngram_match(sa, sb, n):
-
-    nga = utils.make_ngram(sa, n)
-    ngb = utils.make_ngram(sb, n)
-
-    matches = 0
-    c1 = Counter(nga)
-    info = []
-    for ng in ngb:
-        if c1[ng] > 0:
-            c1[ng] -= 1
-            matches += 1
-            info.append(ng)
-    features = match_features(matches, len(nga), len(ngb))
-    return features, info
-
-
-def ngram_match_stopwords(sa, sb, n):
-    def _make_ngrams(sent, n):
-        rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
-        rez.append(sent[n - 1:])
-        return zip(*rez)
-
-    nga = _make_ngrams(sa, n)
-    ngb = _make_ngrams(sb, n)
-
-    stopwords = dict_utils.DictLoader().load_dict('stopwords')
-    idf_weight = dict_utils.DictLoader().load_dict('idf')
-
-    new_nga = []
-    for ng in nga:
-        new_ng = []
-        for x in ng:
-            if x not in stopwords:
-                new_ng.append(x)
-        new_ng = tuple(new_ng)
-        if new_ng != ():
-            new_nga.append(new_ng)
-
-    new_ngb = []
-    for ng in ngb:
-        new_ng = []
-        for x in ng:
-            if x.lower() not in stopwords:
-                new_ng.append(x)
-        new_ng = tuple(new_ng)
-        if new_ng != ():
-            new_ngb.append(new_ng)
-
-    def calc_ngram_idf(ngram):
-        res = 0.0
-        for ng in ngram:
-            res += idf_weight.get(ng, 10.0)
-        return res
-
-    idf_sa, idf_sb = 0.0, 0.0
-    for ng in nga:
-        idf_sa += calc_ngram_idf(ng)
-    for ng in ngb:
-        idf_sb += calc_ngram_idf(ng)
-
-    matches = 0
-    c1 = Counter(nga)
-    info = []
-    for ng in ngb:
-        if c1[ng] > 0:
-            c1[ng] -= 1
-            matches += calc_ngram_idf(ng)
-            info.append(ng)
-    features = match_features(matches, idf_sa, idf_sb)
-    return features, info
-
-
-class nLemmaGramOverlapMatchFeature(Feature):
     def extract(self, train_instance):
-        lemma_sa, lemma_sb = train_instance.get_word(type='lemma', stopwords=True)
-        features, infos = self.core_extract(lemma_sa, lemma_sb)
+        sa, sb = train_instance.get_word(type=self.type, stopwords=True)
+        unigram_overlap = utils.ngram_match(sa, sb, 1)
+        bigram_overlap = utils.ngram_match(sa, sb, 2)
+        trigram_overlap = utils.ngram_match(sa, sb, 3)
+        features = [unigram_overlap, bigram_overlap, trigram_overlap]
+        infos = [sa, sb]
         return features, infos
 
-    def core_extract(self, sa, sb):
-        unigram_overlap, unigram_info = ngram_match(sa, sb, 1)
-        bigram_overlap, bigram_info = ngram_match(sa, sb, 2)
-        trigram_overlap, trigram_info = ngram_match(sa, sb, 3)
-        return unigram_overlap + bigram_overlap + trigram_overlap, [unigram_info, bigram_info, trigram_info]
+
+class nCharGramOverlapFeature(Feature):
+
+    def __init__(self, stopwords, **kwargs):
+        super(nCharGramOverlapFeature, self).__init__(**kwargs)
+        self.stopwords = stopwords
+        self.feature_name = self.feature_name + '-%s'%stopwords
 
 
-class nWordGramOverlapMatchFeature(Feature):
-    def extract(self, train_instance):
-        word_sa, word_sb = train_instance.get_word(type='word', stopwords=True)
-        features, infos = self.core_extract(word_sa, word_sb)
-        return features, infos
-
-    def core_extract(self, sa, sb):
-        unigram_overlap, unigram_info = ngram_match(sa, sb, 1)
-        bigram_overlap, bigram_info = ngram_match(sa, sb, 2)
-        trigram_overlap, trigram_info = ngram_match(sa, sb, 3)
-        return unigram_overlap + bigram_overlap + trigram_overlap, [unigram_info, bigram_info, trigram_info]
-
-
-class nCharGramOverlapMatchFeature(Feature):
     def extract(self, train_instance):
         char_sa, char_sb = train_instance.get_char()
-        features, infos = self.core_extract(char_sa, char_sb)
-        infos = [[''.join(x) for x in info] for info in infos]
+        bigram_overlap = utils.ngram_match(char_sa, char_sb, 2)
+        trigram_overlap = utils.ngram_match(char_sa, char_sb, 3)
+        four_gram_overlap = utils.ngram_match(char_sa, char_sb, 4)
+        five_gram_overlap = utils.ngram_match(char_sa, char_sb, 5)
+        features = [bigram_overlap, trigram_overlap, four_gram_overlap, five_gram_overlap]
+        infos = [char_sa, char_sb]
         return features, infos
 
-    def core_extract(self, sa, sb):
-        bigram_overlap, bigram_info = ngram_match(sa, sb, 2)
-        trigram_overlap, trigram_info = ngram_match(sa, sb, 3)
-        four_gram_overlap, four_gram_info = ngram_match(sa, sb, 4)
-        five_gram_overlap, five_gram_info = ngram_match(sa, sb, 5)
-        return bigram_overlap + trigram_overlap + four_gram_overlap + five_gram_overlap, \
-               [bigram_info, trigram_info, four_gram_info, five_gram_info]
 
-
-class nWordGramOverlapBeforeStopwordsMatchFeature(Feature):
+class nGramOverlapBeforeStopwordsFeature(Feature):
     """
     Word is lower, not remove stopwords
     """
 
+    def __init__(self, type, **kwargs):
+        super(nGramOverlapBeforeStopwordsFeature, self).__init__(**kwargs)
+        self.type = type
+        self.feature_name = self.feature_name + '-%s'%type
+
     def extract(self, train_instance):
-        lemma_sa, lemma_sb = train_instance.get_word(type='word', lower=True)
-        features, infos = self.core_extract(lemma_sa, lemma_sb)
+        sa, sb = train_instance.get_word(type=self.type, lower=True)
+        unigram_overlap, unigram_info = self.ngram_match_remove_stopwords(sa, sb, 1)
+        bigram_overlap, bigram_info = self.ngram_match_remove_stopwords(sa, sb, 2)
+        trigram_overlap, trigram_info = self.ngram_match_remove_stopwords(sa, sb, 3)
+        features = [unigram_overlap, bigram_overlap, trigram_overlap]
+        infos = [unigram_info, bigram_info, trigram_info]
         return features, infos
 
-    def core_extract(self, sa, sb):
-        unigram_overlap, unigram_info = ngram_match_stopwords(sa, sb, 1)
-        bigram_overlap, bigram_info = ngram_match_stopwords(sa, sb, 2)
-        trigram_overlap, trigram_info = ngram_match_stopwords(sa, sb, 3)
-        return unigram_overlap + bigram_overlap + trigram_overlap, [unigram_info, bigram_info, trigram_info]
+    @staticmethod
+    def ngram_match_remove_stopwords(sa, sb, n):
+        nga = utils.make_ngram(sa, n)
+        ngb = utils.make_ngram(sb, n)
+
+        stopwords = dict_utils.DictLoader().load_dict('stopwords')
+
+        new_nga = []
+        for ng in nga:
+            new_ng = []
+            for x in ng:
+                if x not in stopwords:
+                    new_ng.append(x)
+            new_ng = tuple(new_ng)
+            if new_ng != ():
+                new_nga.append(new_ng)
+
+        new_ngb = []
+        for ng in ngb:
+            new_ng = []
+            for x in ng:
+                if x.lower() not in stopwords:
+                    new_ng.append(x)
+            new_ng = tuple(new_ng)
+            if new_ng != ():
+                new_ngb.append(new_ng)
+
+        f1 = utils.overlap_f1(new_nga, new_ngb)
+        info = [new_nga, new_ngb]
+        return f1, info
 
 
-class nLemmaGramOverlapBeforeStopwordsMatchFeature(Feature):
+class WeightednGramMatchFeature(Feature):
+    """
+    Word is lower, not remove stopwords
+    """
+    def __init__(self, type, **kwargs):
+        super(WeightednGramMatchFeature, self).__init__(**kwargs)
+        self.type=type
+        self.feature_name = self.feature_name + '-%s'%type
+
+    def extract_information(self, train_instances):
+        seqs = []
+        for train_instance in train_instances:
+            sa, sb = train_instance.get_word(type=self.type, lower=True)
+            seqs.append(sa)
+            seqs.append(sb)
+        self.idf_weight = utils.IDFCalculator(seqs)
+
     def extract(self, train_instance):
-        lemma_sa, lemma_sb = train_instance.get_word(type='lemma')
-        features, infos = self.core_extract(lemma_sa, lemma_sb)
+        sa, sb = train_instance.get_word(type=self.type, lower=True)
+        unigram_overlap, unigram_info = self.weighted_ngram_match(sa, sb, 1, self.idf_weight)
+        bigram_overlap, bigram_info = self.weighted_ngram_match(sa, sb, 2, self.idf_weight)
+        trigram_overlap, trigram_info = self.weighted_ngram_match(sa, sb, 3, self.idf_weight)
+        features = [unigram_overlap, bigram_overlap, trigram_overlap]
+        infos = [sa, sb]
         return features, infos
 
-    def core_extract(self, sa, sb):
-        unigram_overlap, unigram_info = ngram_match_stopwords(sa, sb, 1)
-        bigram_overlap, bigram_info = ngram_match_stopwords(sa, sb, 2)
-        trigram_overlap, trigram_info = ngram_match_stopwords(sa, sb, 3)
-        return unigram_overlap + bigram_overlap + trigram_overlap, [unigram_info, bigram_info, trigram_info]
+    @staticmethod
+    def weighted_ngram_match(sa, sb, n, idf_weight):
 
+        nga = utils.make_ngram(sa, n)
+        ngb = utils.make_ngram(sb, n)
+        default_idf_weight = min(idf_weight.values())
 
-class nCharGramNonStopwordsOverlapMatchFeature(Feature):
-    def extract(self, train_instance):
-        char_sa, char_sb = train_instance.get_char(stopwords=True)
-        features, infos = self.core_extract(char_sa, char_sb)
-        infos = [[''.join(x) for x in info] for info in infos]
-        return features, infos
+        def calc_ngram_idf(ngram):
+            res = 0.0
+            for ng in ngram:
+                res += idf_weight.get(ng, default_idf_weight)
+            return res
 
-    def core_extract(self, sa, sb):
-        bigram_overlap, bigram_info = ngram_match(sa, sb, 2)
-        trigram_overlap, trigram_info = ngram_match(sa, sb, 3)
-        four_gram_overlap, four_gram_info = ngram_match(sa, sb, 4)
-        five_gram_overlap, five_gram_info = ngram_match(sa, sb, 5)
-        return bigram_overlap + trigram_overlap + four_gram_overlap + five_gram_overlap, \
-               [bigram_info, trigram_info, four_gram_info, five_gram_info]
+        idf_sa, idf_sb = 0.0, 0.0
+        for ng in nga:
+            idf_sa += calc_ngram_idf(ng)
+        for ng in ngb:
+            idf_sb += calc_ngram_idf(ng)
 
-
+        matches = 0
+        c1 = Counter(nga)
+        info = []
+        for ng in ngb:
+            if c1[ng] > 0:
+                c1[ng] -= 1
+                matches += calc_ngram_idf(ng)
+                info.append(ng)
+        p, r, f1 = 0., 0., 1.
+        if idf_sa > 0 and idf_sb > 0:
+            p = matches / float(idf_sa)
+            r = matches / float(idf_sb)
+            f1 = 2 * p * r / (p + r) if p + r > 0 else 0.
+        return f1, info
