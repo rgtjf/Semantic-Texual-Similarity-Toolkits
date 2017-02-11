@@ -7,7 +7,7 @@ import codecs
 from functools import wraps
 from collections import Counter
 
-from lib.kernel import vector_kernel as vk
+from stst.lib.kernel import vector_kernel as vk
 
 
 def fn_timer(function):
@@ -221,7 +221,7 @@ def sequence_vector_features(seq1, seq2, idf_weight=None, convey='idf'):
     features, info = vk.get_all_kernel(vec1, vec2)
     # vk.get_linear_kernel(vec1, vec2)[0] + vk.get_stat_kernel(vec1, vec2)[0]
     # features = vk.get_linear_kernel(vec1, vec2)[0] + vk.get_stat_kernel(vec1, vec2)[0]
-    infos = ['linear_kernel', 'stat_kernel', 'non-linear_kernal', idf_weight.keys()[:10], idf_weight.values()[:10]]
+    infos = ['linear_kernel', 'stat_kernel', 'non-linear_kernal', list(idf_weight.keys())[:10], list(idf_weight.values())[:10]]
     return features, infos
 
 def sequence_small_vector_features(seq1, seq2, idf_weight, convey='idf'):
@@ -349,6 +349,12 @@ def sequence_edit_distance_features(sa, sb):
     features.append(levenshtein_disttance(sa, sb))
     infos += ['prefix', 'suffix', 'longest_common_substring', 'longest_common_sequence', 'levenshtein_disttance']
     return features, infos
+
+
+def make_ngram(sent, n):
+    rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
+    rez.append(sent[n - 1:])
+    return list(zip(*rez))
 
 
 if __name__ == '__main__':

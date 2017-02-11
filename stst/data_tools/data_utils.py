@@ -1,15 +1,15 @@
 # coding: utf8
 from __future__ import print_function
 
-import codecs
+import codecs, os
 import traceback
 
 import json
 import pyprind
 
-from ..lib.pycorenlp.corenlp_utils import nlp
-from .. import utils
-from sent_pair import SentPair
+from stst.lib.pycorenlp.corenlp_utils import StanfordNLP
+from stst import utils
+from stst.data_tools.sent_pair import SentPair
 
 
 def load_data(train_file):
@@ -29,7 +29,7 @@ def load_data(train_file):
     return data
 
 
-def load_parse_data(train_file, flag=False):
+def load_parse_data(train_file, flag=False, server_url='http://localhost:9000'):
     """
     Load data after Parse, like POS, NER, etc.
     Value: [ SentPair:class, ... ]
@@ -37,11 +37,16 @@ def load_parse_data(train_file, flag=False):
         flag: False(Default), Load from file (resources....)
               True, Parse and Write to file, and then load from file
     """
-
     ''' Pre-Define Write File '''
     parse_train_file = train_file.replace('data', 'parse')
 
     if flag:
+
+        path = os.path.split(parse_train_file)[0]
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        nlp = StanfordNLP(server_url)
 
         print(train_file)
 
@@ -51,14 +56,10 @@ def load_parse_data(train_file, flag=False):
         print('*' * 50)
         print("Parse Data, train_file=%s, n_train=%d\n" % (train_file, len(data)))
 
-        # idx = 0
         parse_data = []
         process_bar = pyprind.ProgPercent(len(data))
         for (sa, sb, score) in data:
             process_bar.update()
-            # idx += 1
-            # if idx > 20:
-            #     break
             try:
                 parse_sa = nlp.parse(sa)
                 parse_sb = nlp.parse(sb)

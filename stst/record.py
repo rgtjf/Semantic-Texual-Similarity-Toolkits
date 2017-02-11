@@ -2,10 +2,9 @@
 from __future__ import print_function
 
 import csv
-
 import numpy as np
 
-import config
+from stst import config
 
 
 def record(train_file, dev_file, pearsonr, model):

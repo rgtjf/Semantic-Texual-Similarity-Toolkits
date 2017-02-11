@@ -1,5 +1,5 @@
 from features import Feature
-from .. import dict_utils
+from stst import dict_utils
 
 
 class NegativeFeature(Feature):

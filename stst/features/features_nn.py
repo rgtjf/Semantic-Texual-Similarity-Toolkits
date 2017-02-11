@@ -5,8 +5,8 @@ from gensim.models import Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
 
 from features import Feature
-from .. import config, utils, dict_utils
-from ..lib.kernel import vector_kernel as vk
+from stst import config, utils, dict_utils
+from stst.lib.kernel import vector_kernel as vk
 
 
 """

@@ -1,9 +1,9 @@
 # coding: utf8
 from __future__ import print_function
 
-from features import Feature
-from .. import utils
-from ..lib.kernel import vector_kernel as vk
+from stst.features.features import Feature
+from stst import utils
+from stst.lib.kernel import vector_kernel as vk
 
 
 class POSMatchFeature(Feature):

@@ -4,20 +4,15 @@ from __future__ import print_function
 
 from collections import Counter
 
-from features import Feature
-from .. import dict_utils
+from stst.features.features import Feature
+from stst import dict_utils, utils
 
 
 class nLemmaGramOverlapFeature(Feature):
     def _ngram_match(self, sa, sb, n):
 
-        def _make_ngrams(sent, n):
-            rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
-            rez.append(sent[n - 1:])
-            return zip(*rez)
-
-        nga = _make_ngrams(sa, n)
-        ngb = _make_ngrams(sb, n)
+        nga = utils.make_ngram(sa, n)
+        ngb = utils.make_ngram(sb, n)
 
         matches = 0
         c1 = Counter(nga)
@@ -51,13 +46,8 @@ class nLemmaGramOverlapFeature(Feature):
 class nWordGramOverlapFeature(Feature):
     def _ngram_match(self, sa, sb, n):
 
-        def _make_ngrams(sent, n):
-            rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
-            rez.append(sent[n - 1:])
-            return zip(*rez)
-
-        nga = _make_ngrams(sa, n)
-        ngb = _make_ngrams(sb, n)
+        nga = utils.make_ngram(sa, n)
+        ngb = utils.make_ngram(sb, n)
 
         matches = 0
         c1 = Counter(nga)
@@ -91,13 +81,8 @@ class nWordGramOverlapFeature(Feature):
 class nCharGramOverlapFeature(Feature):
     def _ngram_match(self, sa, sb, n):
 
-        def _make_ngrams(sent, n):
-            rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
-            rez.append(sent[n - 1:])
-            return zip(*rez)
-
-        nga = _make_ngrams(sa, n)
-        ngb = _make_ngrams(sb, n)
+        nga = utils.make_ngram(sa, n)
+        ngb = utils.make_ngram(sb, n)
 
         matches = 0
         c1 = Counter(nga)
@@ -138,13 +123,8 @@ class nWordGramOverlapBeforeStopwordsFeature(Feature):
 
     def _ngram_match(self, sa, sb, n):
 
-        def _make_ngrams(sent, n):
-            rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
-            rez.append(sent[n - 1:])
-            return zip(*rez)
-
-        nga = _make_ngrams(sa, n)
-        ngb = _make_ngrams(sb, n)
+        nga = utils.make_ngram(sa, n)
+        ngb = utils.make_ngram(sb, n)
 
         stopwords = dict_utils.DictLoader().load_dict('stopwords')
 
@@ -200,13 +180,8 @@ class nWordGramOverlapBeforeStopwordsFeature(Feature):
 class nLemmaGramOverlapBeforeStopwordsFeature(Feature):
     def _ngram_match(self, sa, sb, n):
 
-        def _make_ngrams(sent, n):
-            rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
-            rez.append(sent[n - 1:])
-            return zip(*rez)
-
-        nga = _make_ngrams(sa, n)
-        ngb = _make_ngrams(sb, n)
+        nga = utils.make_ngram(sa, n)
+        ngb = utils.make_ngram(sb, n)
 
         stopwords = dict_utils.DictLoader().load_dict('stopwords')
 
@@ -267,13 +242,8 @@ class nLemmaGramOverlapBeforeStopwordsFeature(Feature):
 class nCharGramNonStopwordsOverlapFeature(Feature):
     def _ngram_match(self, sa, sb, n):
 
-        def _make_ngrams(sent, n):
-            rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
-            rez.append(sent[n - 1:])
-            return zip(*rez)
-
-        nga = _make_ngrams(sa, n)
-        ngb = _make_ngrams(sb, n)
+        nga = utils.make_ngram(sa, n)
+        ngb = utils.make_ngram(sb, n)
 
         matches = 0
         c1 = Counter(nga)

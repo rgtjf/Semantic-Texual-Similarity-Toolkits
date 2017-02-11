@@ -13,8 +13,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
 from features import Feature
-from .. import utils
-from .. import config
+from stst import utils, config
 
 
 class AsiyaDriver(object):

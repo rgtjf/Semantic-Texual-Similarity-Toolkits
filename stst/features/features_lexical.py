@@ -1,6 +1,6 @@
-from features import Feature
-from .. import utils
-from ..lib.sentence_similarity.short_sentence_similarity import *
+from stst.features.features import Feature
+from stst import utils
+from stst.lib.sentence_similarity.short_sentence_similarity import *
 
 
 class ShortSentenceFeature(Feature):

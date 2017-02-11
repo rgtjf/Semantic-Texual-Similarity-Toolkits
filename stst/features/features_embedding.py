@@ -3,8 +3,8 @@ import numpy as np
 import pyjsonrpc
 
 from features import Feature
-from ..lib.kernel import vector_kernel as vk
-from .. import dict_utils
+from stst.lib.kernel import vector_kernel as vk
+from stst import dict_utils
 
 class Embedding(object):
     def __init__(self):

@@ -4,7 +4,7 @@ from __future__ import print_function
 import json, pyprind
 import os
 
-from .. import utils, config
+from stst import utils, config
 
 class Feature(object):
     def __init__(self,

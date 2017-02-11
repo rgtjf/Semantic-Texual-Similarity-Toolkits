@@ -7,7 +7,7 @@ from sklearn import preprocessing
 from sklearn.datasets import load_svmlight_file
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 
-import utils
+from stst import utils
 
 __all__ = [
     "Strategy",

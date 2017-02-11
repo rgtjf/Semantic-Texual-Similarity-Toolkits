@@ -3,8 +3,8 @@ from __future__ import print_function
 
 from nltk.corpus import wordnet as wn
 
-from .. import utils
-from ..dict_utils import DictLoader
+from stst import utils
+from stst.dict_utils import DictLoader
 
 class SentPair(object):
     def __init__(self, parse_json):

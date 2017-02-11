@@ -5,8 +5,7 @@ import math, os
 import nltk.corpus
 import pyprind
 
-import config
-import utils
+from stst import config, utils
 
 
 @utils.singleton

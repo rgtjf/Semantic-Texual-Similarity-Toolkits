@@ -3,9 +3,8 @@ from __future__ import print_function
 
 import random, os
 
-import config
-import utils
-from features import Feature
+from stst import config, utils
+from stst.features.features import Feature
 
 
 class Model(object):

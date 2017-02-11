@@ -1,9 +1,8 @@
 
-from features import *
-from features_embedding import *
-from features_lexical import *
-from features_pos import *
-from features_basic import *
-from features_ngram import *
-from features_bow import *
-from features_align import *
+from stst.features import *
+from stst.features.features_lexical import *
+from stst.features.features_pos import *
+from stst.features.features_basic import *
+from stst.features.features_ngram import *
+from stst.features.features_bow import *
+from stst.features.features_align import *

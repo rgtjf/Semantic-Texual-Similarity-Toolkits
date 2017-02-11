@@ -1,6 +1,5 @@
-from features import Feature
-from .. import dict_utils
-from .. import utils
+from stst.features.features import Feature
+from stst import dict_utils, utils
 
 
 class BOWFeature(Feature):
