@@ -7,7 +7,7 @@ pip install stst
 ```
 
 ## Requirements
-- python2
+- python
 - standford CoreNLP
 
 

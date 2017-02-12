@@ -4,8 +4,9 @@ from setuptools import find_packages
 setup(
     name='stst',
     packages=find_packages(),
-    version='0.2.0',
-    description='stst',
+    version='0.2.1',
+    description='Semantic Textual Similarity (STS) measures the degree of equivalence in the underlying semantics of paired snippets of text.',
+    long_description=''.join(open('README.md').readlines()),
     author='rgtjf',
     author_email='rgtjf1@163.com',
     url='https://github.com/rgtjf/Semantic-Texual-Similarity-Toolkits',
