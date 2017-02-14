@@ -49,8 +49,9 @@ model.add(stst.PosAlignmentFeature())
 
 # model.add(stst.POSFeature())
 
-train_instances = stst.load_parse_data(train_file, flag=False)
-dev_instances = stst.load_parse_data(dev_file, flag=False)
+# flag = Flase, load from already parsed file
+train_instances = stst.load_parse_data(train_file, flag=True, server_url='CORENLP SERVER ADDRESS')
+dev_instances = stst.load_parse_data(dev_file, flag=True, server_url='CORENLP SERVER ADDRESS')
 model.train(train_instances, train_file)
 model.test(dev_instances, dev_file)
 pearsonr = stst.eval_file(model.output_file, dev_gs_file)
