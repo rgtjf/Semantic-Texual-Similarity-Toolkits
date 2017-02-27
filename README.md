@@ -20,6 +20,11 @@
     $ pip install -r requirements.txt
     ```
 
+## TODO
+- embedding features, run the embedding servefr
+- chrome driver, to caputure mt features
+- theano, lasagne, dl scores
+
 ## Usage
 ```python
 

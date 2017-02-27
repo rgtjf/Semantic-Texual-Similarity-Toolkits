@@ -118,4 +118,3 @@ class MinAvgMaxEmbeddingFeature(Feature):
 
         infos = [emb_type, lower]
         return features, infos
-
