@@ -21,6 +21,17 @@ def eval_file(predict_file, gold_feature_file):
     return pearsonr
 
 
+def eval_output_file(predict_file):
+    predict, gold = [], []
+    with open(predict_file) as f:
+        for line in f:
+            line = line.strip().split('\t#\t')
+            predict.append(float(line[0]))
+            gold.append(float(line[1].split('\t')[0]))
+    pearsonr = evaluation(predict, gold)
+    return pearsonr
+
+
 def eval_file_corpus(predict_file_list, gold_file_list):
     predicts, golds = [], []
     for predict_file, gold_file in zip(predict_file_list, gold_file_list):

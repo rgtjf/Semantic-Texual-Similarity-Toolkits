@@ -7,6 +7,8 @@ import codecs
 from functools import wraps
 from collections import Counter
 
+import os
+
 from stst.lib.kernel import vector_kernel as vk
 
 
@@ -63,16 +65,16 @@ def write_dict_to_csv(contents_dict, to_file):
         writer.writerows(contents)
 
 
-def create_write_file(file_name):
+def create_write_file(file_name, mode='w'):
     import os
     path = os.path.split(file_name)[0]
     if not os.path.exists(path):
         os.makedirs(path)
-    return codecs.open(file_name, 'w', encoding='utf8')
+    return codecs.open(file_name, mode, encoding='utf8')
 
 
-def create_read_file(file_name):
-    return codecs.open(file_name, 'r', encoding='utf8')
+def create_read_file(file_name, mode='r'):
+    return codecs.open(file_name, mode, encoding='utf8')
 
 
 @fn_timer
@@ -363,6 +365,19 @@ def make_ngram(sent, n):
     rez.append(sent[n - 1:])
     return list(zip(*rez))
 
+
+class FileManager(object):
+
+    @classmethod
+    def get_file(cls, path):
+        path, file = os.path.split(path)
+        return file
+
+    @classmethod
+    def get_filename(cls, path):
+        path, file = os.path.split(path)
+        filename = os.path.splitext(file)[0]
+        return filename
 
 if __name__ == '__main__':
     sa = ["a", "young", "person", "deep", "in", "thought", "."]

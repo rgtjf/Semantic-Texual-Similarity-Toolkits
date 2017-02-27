@@ -8,6 +8,7 @@ class StanfordNLP:
         output = self.server.annotate(text, properties={
             'timeout': '50000',
             'ssplit.isOneSentence': 'true',
+            'depparse.DependencyParseAnnotator': 'basic',
             'annotators': 'tokenize,lemma,ssplit,pos,depparse,parse,ner',
             # 'annotators': 'tokenize,lemma,ssplit,pos,ner',
             'outputFormat': 'json'

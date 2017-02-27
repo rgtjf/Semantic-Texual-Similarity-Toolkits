@@ -7,8 +7,7 @@ import traceback
 import json
 import pyprind
 
-from stst.lib.pycorenlp.corenlp_utils import StanfordNLP
-from stst import utils
+from stst import utils, config
 from stst.data_tools.sent_pair import SentPair
 
 
@@ -29,7 +28,17 @@ def load_data(train_file):
     return data
 
 
-def load_parse_data(train_file, flag=False, server_url='http://localhost:9000'):
+def load_STS(train_file):
+    with utils.create_read_file(train_file) as f:
+        data = []
+        for line in f:
+            line = line.strip().split('\t')
+            score = float(line[4])
+            sa, sb = line[5], line[6]
+            data.append((sa, sb, score))
+    return data
+
+def load_parse_data(train_file, nlp, flag=False):
     """
     Load data after Parse, like POS, NER, etc.
     Value: [ SentPair:class, ... ]
@@ -38,20 +47,18 @@ def load_parse_data(train_file, flag=False, server_url='http://localhost:9000'):
               True, Parse and Write to file, and then load from file
     """
     ''' Pre-Define Write File '''
-    parse_train_file = train_file.replace('data', 'parse')
 
-    if flag:
+    # parse_train_file = config.PARSE_DIR + '/' + \
+    #                    utils.FileManager.get_file(train_file)
 
-        path = os.path.split(parse_train_file)[0]
-        if not os.path.exists(path):
-            os.makedirs(path)
+    parse_train_file = train_file.replace('./data', './generate/parse')
 
-        nlp = StanfordNLP(server_url)
+    if flag or not os.path.isfile(parse_train_file):
 
         print(train_file)
 
         ''' Parse Data '''
-        data = load_data(train_file)
+        data = load_STS(train_file)
 
         print('*' * 50)
         print("Parse Data, train_file=%s, n_train=%d\n" % (train_file, len(data)))
@@ -66,9 +73,6 @@ def load_parse_data(train_file, flag=False, server_url='http://localhost:9000'):
             except Exception:
                 print(sa, sb)
                 traceback.print_exc()
-                raise Exception('Check whether you have started the CoreNLP server e.g.\n'
-                                '$ cd stanford-corenlp-full-2015-12-09/ \n'
-                                '$ java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer')
             parse_data.append((parse_sa, parse_sb, score))
 
         ''' Write Data to File '''
@@ -80,7 +84,7 @@ def load_parse_data(train_file, flag=False, server_url='http://localhost:9000'):
     ''' Load Data from File '''
     print('*' * 50)
     parse_data = []
-    with codecs.open(parse_train_file, 'r', encoding='utf8') as f:
+    with utils.create_read_file(parse_train_file) as f:
         for line in f:
             parse_json = json.loads(line)
             sentpair_instance = SentPair(parse_json)
