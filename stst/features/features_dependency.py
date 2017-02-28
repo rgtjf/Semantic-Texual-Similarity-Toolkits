@@ -16,7 +16,7 @@ class DependencyGramFeature(Feature):
             dep_sb = [(dep[1], dep[2]) for dep in dep_sb]
             seqs.append(dep_sa)
             seqs.append(dep_sb)
-        self.idf_weight = utils.IDFCalculator(seqs)
+        self.idf_weight = utils.idf_calculator(seqs)
 
     def extract(self, train_instance):
         dep_sa, dep_sb = train_instance.get_dependency()
@@ -24,10 +24,10 @@ class DependencyGramFeature(Feature):
         dep_sb = [(dep[1], dep[2]) for dep in dep_sb]
 
         features = []
-        feature, info = utils.sequence_match_features(dep_sa, dep_sb)
+        feature, info = utils.sentence_match_features(dep_sa, dep_sb)
         features += feature
 
-        feature, info = utils.sequence_vector_features(dep_sa, dep_sb, self.idf_weight, convey=self.convey)
+        feature, info = utils.sentence_vectorize_features(dep_sa, dep_sb, self.idf_weight, convey=self.convey)
         features += feature
 
         infos = [dep_sa, dep_sb]
@@ -47,16 +47,16 @@ class DependencyRelationFeature(Feature):
             dep_sa, dep_sb = train_instance.get_dependency()
             seqs.append(dep_sa)
             seqs.append(dep_sb)
-        self.idf_weight = utils.IDFCalculator(seqs)
+        self.idf_weight = utils.idf_calculator(seqs)
 
     def extract(self, train_instance):
         dep_sa, dep_sb = train_instance.get_dependency()
 
         features = []
-        feature, info = utils.sequence_match_features(dep_sa, dep_sb)
+        feature, info = utils.sentence_match_features(dep_sa, dep_sb)
         features += feature
 
-        feature, info = utils.sequence_vector_features(dep_sa, dep_sb, self.idf_weight, convey=self.convey)
+        feature, info = utils.sentence_vectorize_features(dep_sa, dep_sb, self.idf_weight, convey=self.convey)
         features += feature
 
         infos = [dep_sa, dep_sb]

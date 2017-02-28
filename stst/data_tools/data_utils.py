@@ -67,12 +67,8 @@ def load_parse_data(train_file, nlp, flag=False):
         process_bar = pyprind.ProgPercent(len(data))
         for (sa, sb, score) in data:
             process_bar.update()
-            try:
-                parse_sa = nlp.parse(sa)
-                parse_sb = nlp.parse(sb)
-            except Exception:
-                print(sa, sb)
-                traceback.print_exc()
+            parse_sa = nlp.parse(sa)
+            parse_sb = nlp.parse(sb)
             parse_data.append((parse_sa, parse_sb, score))
 
         ''' Write Data to File '''

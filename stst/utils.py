@@ -2,11 +2,11 @@
 from __future__ import print_function
 
 import time
-import csv, nltk, math
+import csv, math
 import codecs
 from functools import wraps
 from collections import Counter
-
+import numpy as np
 import os
 
 from stst.lib.kernel import vector_kernel as vk
@@ -59,6 +59,8 @@ def get_tag(pos):
 
 
 def write_dict_to_csv(contents_dict, to_file):
+    fieldnames = []
+    contents = []
     with open(to_file, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -83,10 +85,14 @@ def test():
     # print(func('2016-01-01 01:10:00'))
     # print(getDistrict('f2c8c4bb99e6377d21de71275afd6cd2'))
 
+#############################################
+# ` Part I
+# Caclulate common parts between sa and sb
+#############################################
 
-def jaccrad_coeff(seq1, seq2):
-    filtered_seq1 = list(set(seq1))
-    filtered_seq2 = list(set(seq2))
+def jaccrad_coeff(sa, sb):
+    filtered_seq1 = list(set(sa))
+    filtered_seq2 = list(set(sb))
     A_union_B = len(set(filtered_seq1 + filtered_seq2))
     A_inter_B = len([token for token in filtered_seq1 if token in filtered_seq2])
     if A_union_B == 0:
@@ -94,184 +100,40 @@ def jaccrad_coeff(seq1, seq2):
     return float(A_inter_B) / float(A_union_B)
 
 
-def dice_coeff(seq1, seq2):
-    filtered_seq1 = list(set(seq1))
-    filtered_seq2 = list(set(seq2))
+def dice_coeff(sa, sb):
+    filtered_seq1 = list(set(sa))
+    filtered_seq2 = list(set(sb))
     A_inter_B = len([token for token in filtered_seq1 if token in filtered_seq2])
     if len(filtered_seq1) + len(filtered_seq2) == 0:
         return 0
     return 2 * float(A_inter_B) / float(len(filtered_seq1) + len(filtered_seq2))
 
 
-def overlap_coeff(seq1, seq2):
-    filtered_seq1 = list(set(seq1))
-    filtered_seq2 = list(set(seq2))
+def overlap_coeff(sa, sb):
+    filtered_seq1 = list(set(sa))
+    filtered_seq2 = list(set(sb))
     A_inter_B = len([token for token in filtered_seq1 if token in filtered_seq2])
     if len(filtered_seq1) == 0:
         return 0
     return float(A_inter_B) / float(len(filtered_seq1))
 
 
-def overlap_f1(seq1, seq2):
+def overlap_f1(sa, sb):
     matches = 0.0
-    c1 = Counter(seq1)
+    c1 = Counter(sa)
     info = []
-    for ng in seq2:
+    for ng in sb:
         if c1[ng] > 0:
             c1[ng] -= 1
             matches += 1
             info.append(ng)
     p, r, f1 = 0., 0., 1.
-    if len(seq1) > 0 and len(seq2) > 0:
-        p = matches / len(seq1)
-        r = matches / len(seq2)
+    if len(sa) > 0 and len(sb) > 0:
+        p = matches / len(sa)
+        r = matches / len(sb)
         f1 = 2 * p * r / (p + r) if p + r > 0 else 0.
     return f1
 
-
-def ngram_match(seq1, seq2, n):
-    nga = make_ngram(seq1, n)
-    ngb = make_ngram(seq2, n)
-    f1 = overlap_f1(nga, ngb)
-    return f1
-
-
-# vocab_idx_map: word and index mapping, e.g., egg=1
-def Vectorize(vocab_idx_map, idf_dict, list_of_word):
-    vec = [float(0)] * len(idf_dict.keys())
-    vdist = nltk.FreqDist(list_of_word)
-    good_keys = [key for key in vdist.keys() if key in idf_dict.keys()]
-    word_cnt = 0
-    for key in good_keys:
-        word_cnt += vdist[key]
-    for key in good_keys:
-        tf = float(vdist[key]) / float(word_cnt)
-        val = tf * idf_dict[key]
-        vec[vocab_idx_map[key]] = val
-    return vec
-
-
-def sequence_match_features(seq1, seq2):
-    features, infos = [], []
-    features.append(jaccrad_coeff(seq1, seq2))
-    features.append(dice_coeff(seq1, seq2))
-    features.append(overlap_coeff(seq1, seq2))
-    features.append(overlap_coeff(seq1, seq2))
-    features.append(overlap_f1(seq1, seq2))
-    infos += ['jaccrad_coeff', 'dice_coeff', 'overlap_coeff', 'overlap_coeff', 'overlap_f1']
-    return features, infos
-
-
-# min_cnt = 3, 0.65
-# min_cnt = 0, 0.6891
-# min_cnt = 1, 0.6891
-# min_cnt = 2,
-def IDFCalculator(sequence_list, min_cnt=1):
-    doc_num = 0
-    word_list = []
-    for sequence in sequence_list:
-        word_list += sequence
-        doc_num += 1
-
-    vdist = nltk.FreqDist(word_list)
-    idf_dict = {}
-    good_keys = [v for v in vdist.keys() if vdist[v] >= min_cnt]
-
-    for key in good_keys:
-        idf_dict[key] = vdist[key]
-
-    for key in idf_dict.keys():
-        idf_dict[key] = math.log(float(doc_num) / float(idf_dict[key])) / math.log(10)
-
-    return idf_dict
-
-
-def sequence_vector_features(seq1, seq2, idf_weight=None, convey='idf'):
-    """
-       ensure idf_weight contains all words in seq1 and seq2
-       to achieve this, idf_weight format should be the same with seq1
-       e.g., train_instance.get_word(type='lemma', lower=True)
-    """
-
-    ''' get vocab index '''
-    if idf_weight is None:
-        bow = set(seq1 + seq2)
-        w2i = {w: i for i, w in enumerate(bow)}
-        convey = 'count'
-    else:
-        w2i = {w: i for i, w in enumerate(idf_weight.keys())}
-
-    ''' get idf min_value '''
-    if idf_weight is not None and convey == 'idf':
-        min_idf_weight = min(idf_weight.values())
-
-    ''' not very safe, Vectorize is more safe'''
-    vec1 = [float(0)] * len(w2i)
-    for w in seq1:
-        if convey == 'idf':
-            vec1[w2i[w]] += idf_weight.get(w, min_idf_weight)
-        elif convey == 'count':
-            vec1[w2i[w]] += 1
-        else:
-            raise NotImplementedError
-
-    vec2 = [float(0)] * len(w2i)
-    for w in seq2:
-        if convey == 'idf':
-            vec2[w2i[w]] += idf_weight.get(w, min_idf_weight)
-        elif convey == 'count':
-            vec2[w2i[w]] += 1
-        else:
-            raise NotImplementedError
-
-    vec1 = vk.normalize(vec1)
-    vec2 = vk.normalize(vec2)
-
-    features, info = vk.get_all_kernel(vec1, vec2)
-    # vk.get_linear_kernel(vec1, vec2)[0] + vk.get_stat_kernel(vec1, vec2)[0]
-    # features = vk.get_linear_kernel(vec1, vec2)[0] + vk.get_stat_kernel(vec1, vec2)[0]
-    infos = ['linear_kernel', 'stat_kernel', 'non-linear_kernal', list(idf_weight.keys())[:10], list(idf_weight.values())[:10]]
-    return features, infos
-
-def sequence_small_vector_features(seq1, seq2, idf_weight, convey='idf'):
-    """
-    ensure idf_weight contains all words in seq1 and seq2
-    to achieve this, idf_weight format should be the same with seq1
-    e.g., train_instance.get_word(type='lemma', lower=True)
-    """
-
-    ''' get vocab index '''
-    bow = set(seq1 + seq2)
-    w2i = {w: i for i, w in enumerate(bow)}
-
-    ''' get min_idf_weight as default idf_weight '''
-    min_idf_weight = min(idf_weight.values())
-
-    ''' not very safe, Vectorize is more safe'''
-    vec1 = [float(0)] * len(w2i)
-    for w in seq1:
-        if convey == 'idf':
-            vec1[w2i[w]] += idf_weight.get(w, min_idf_weight)
-        elif convey == 'count':
-            vec1[w2i[w]] += 1
-        else:
-            raise NotImplementedError
-
-    vec2 = [float(0)] * len(w2i)
-    for w in seq2:
-        if convey == 'idf':
-            vec2[w2i[w]] += idf_weight.get(w, 0.0)
-        elif convey == 'count':
-            vec2[w2i[w]] += 1
-        else:
-            raise NotImplementedError
-
-    vec1 = vk.normalize(vec1)
-    vec2 = vk.normalize(vec2)
-
-    features, info = vk.get_all_kernel(vec1, vec2)
-    infos = ['linear_kernel', 'stat_kernel', 'non-linear_kernal', idf_weight.keys()[:10], idf_weight.values()[:10]]
-    return features, infos
 
 def longest_common_suffix(sa, sb):
     l = min(len(sa), len(sb))
@@ -349,7 +211,108 @@ def levenshtein_disttance(sa, sb):
     return rr
 
 
-def sequence_edit_distance_features(sa, sb):
+def make_ngram(sent, n):
+    rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
+    rez.append(sent[n - 1:])
+    return list(zip(*rez))
+
+
+def ngram_match(sa, sb, n):
+    nga = make_ngram(sa, n)
+    ngb = make_ngram(sb, n)
+    f1 = overlap_f1(nga, ngb)
+    return f1
+
+
+#############################################
+# ` Part II
+# idf_calculator: gain idf from sentence list
+#
+#############################################
+
+def idf_calculator(sentence_list, min_cnt=1):
+    doc_num = 0
+    word_list = []
+    for sequence in sentence_list:
+        word_list += sequence
+        doc_num += 1
+
+    word_count = Counter()
+    for word in word_list:
+        word_count[word] += 1
+
+    idf_dict = {}
+    good_keys = [v for v in word_count.keys() if word_count[v] >= min_cnt]
+
+    for key in good_keys:
+        idf_dict[key] = word_count[key]
+
+    for key in idf_dict.keys():
+        idf_dict[key] = math.log(float(doc_num) / float(idf_dict[key])) / math.log(10)
+
+    return idf_dict
+
+
+def vectorize(sentence, idf_weight, convey='idf'):
+    word2index = {word: i for i, word in enumerate(idf_weight.keys())}
+    vec = [float(0)] * len(word2index)
+    for word in sentence:
+        if word not in word2index:
+            continue
+        if convey == 'idf':
+            vec[word2index[word]] += idf_weight[word]
+        elif convey == 'count':
+            vec[word2index[word]]  += 1
+        else:
+            raise NotImplementedError
+    return vec
+
+
+def vector_similarity(vec1, vec2, normlize=True):
+    """
+    :return:
+     example:
+        vec1 = [0, 1]
+        vec2 = [1, 0]
+        return: ['1.414', '1.0', ...], ['euclidean', 'cosine', ...]
+
+        which means:
+            euclidean 1.41421356237
+            cosine 1.0
+            manhattan 2
+            chebyshev_distance 1
+            spearmanr -1.0
+            kendalltau -1.0
+            pearsonr -1.0
+            polynomial 1.0
+            rbf 0.493068691395
+            laplacian 0.367879441171
+            sigmoid 0.761594155956
+    """
+    if normlize:
+        vec1 = vk.normalize(vec1)
+        vec2 = vk.normalize(vec2)
+    return vk.get_all_kernel(vec1, vec2)
+
+
+#############################################
+# ` Part III
+#  merge all above basic functions
+#
+#############################################
+
+def sentence_match_features(seq1, seq2):
+    features, infos = [], []
+    features.append(jaccrad_coeff(seq1, seq2))
+    features.append(dice_coeff(seq1, seq2))
+    features.append(overlap_coeff(seq1, seq2))
+    features.append(overlap_coeff(seq1, seq2))
+    features.append(overlap_f1(seq1, seq2))
+    infos += ['jaccrad_coeff', 'dice_coeff', 'overlap_coeff', 'overlap_coeff', 'overlap_f1']
+    return features, infos
+
+
+def sentence_sequence_features(sa, sb):
     features, infos = [], []
     features.append(longest_common_prefix(sa, sb))
     features.append(longest_common_suffix(sa, sb))
@@ -360,10 +323,160 @@ def sequence_edit_distance_features(sa, sb):
     return features, infos
 
 
-def make_ngram(sent, n):
-    rez = [sent[i:(-n + i + 1)] for i in range(n - 1)]
-    rez.append(sent[n - 1:])
-    return list(zip(*rez))
+def sentence_vectorize_features(sa, sb, idf_weight, convey='idf'):
+    """
+       ensure idf_weight contains all words in seq1 and seq2
+       to achieve this, idf_weight format should be the same with seq1
+       e.g., train_instance.get_word(type='lemma', lower=True)
+    :param idf_weight: dict
+    :param convey: 'idf' or 'count'
+    :return:
+    """
+    """
+       ensure idf_weight contains all words in seq1 and seq2
+       to achieve this, idf_weight format should be the same with seq1
+       e.g., train_instance.get_word(type='lemma', lower=True)
+    """
+    vec1 = vectorize(sa, idf_weight)
+    vec2 = vectorize(sb, idf_weight)
+    features, info = vector_similarity(vec1, vec2)
+
+    info = ['linear_kernel', 'stat_kernel', 'non-linear_kernal',
+            list(idf_weight.keys())[:10], list(idf_weight.values())[:10]]
+    return features, info
+
+
+#############################################
+# ` Part IV
+#  word embedding
+#
+#############################################
+
+def load_word_embedding(w2i, emb_file, ndim, binary=False):
+    pre_trained = {}
+    nwords = len(w2i)
+    embeddings = np.random.uniform(-0.25, 0.25, (nwords, ndim))
+
+    print('Load word embedding: %s' % emb_file)
+
+    if binary is False:
+        with open(emb_file, 'r') as f:
+            for line in f:
+                sp = line.split()
+                assert len(sp) == ndim + 1
+                w = sp[0]
+                emb = [float(x) for x in sp[1:]]
+                if w in w2i and w not in pre_trained:
+                    embeddings[w2i[w]] = emb
+                    pre_trained[w] = 1
+
+    else:
+        with open(emb_file, 'rb') as f:
+            header = f.readline()
+            vocab_size, layer1_size = map(int, header.split())
+            binary_len = np.dtype('float32').itemsize * layer1_size
+            for line in range(vocab_size):
+                word = []
+                while True:
+                    ch = f.read(1)
+                    if ch == ' ':
+                        word = ''.join(word)
+                        break
+                    if ch != '\n':
+                        word.append(ch)
+                w = word
+                emb = np.fromstring(f.read(binary_len), dtype='float32').tolist()
+                assert len(emb) == ndim
+                if w in w2i and w not in pre_trained:
+                    embeddings[w2i[w]] = emb
+                    pre_trained[w] = 1
+    pre_trained_len = len(pre_trained)
+    print(('Pre-trained: %d (%.2f%%)' %
+           (pre_trained_len, pre_trained_len * 100.0 / nwords)))
+    oov_word_list = [w for w in w2i if w not in pre_trained]
+    print('oov word list example (30):', oov_word_list[:30])
+    return embeddings
+
+#
+# my_emb_rep = {
+#     'glove100': '/home/junfeng/GloVe/glove.6B.100d.txt',
+#     'glove300': '/home/junfeng/GloVe/glove.840B.300d.txt',
+#     'word2vec': '/home/junfeng/word2vec/GoogleNews-vectors-negative300.bin',
+#     'paragram300': '/home/junfeng/paragram-embedding/paragram_300_sl999.txt'
+# }
+#
+#
+# def load_w2v_offline(vw):
+#     """vw is dict about Vocab of Words
+#     """
+#     emb_file = my_emb_rep['word2vec']
+#     ndim = 300
+#     pre_trained = {}
+#     nwords = len(vw)
+#     embeddings = np.random.uniform(-0.25, 0.25, (nwords, ndim))
+#     f = open(emb_file, 'rb')
+#     header = f.readline()
+#     vocab_size, layer1_size = map(int, header.split())
+#     binary_len = np.dtype('float32').itemsize * layer1_size
+#     for line in range(vocab_size):
+#         word = []
+#         while True:
+#             ch = f.read(1)
+#             if ch == ' ':
+#                 word = ''.join(word)
+#                 break
+#             if ch != '\n':
+#                 word.append(ch)
+#         w = word
+#         emb = np.fromstring(f.read(binary_len), dtype='float32').tolist()
+#         assert len(emb) == ndim
+#
+#         if w in vw and w not in pre_trained:
+#             embeddings[vw[w]] = emb
+#             pre_trained[w] = 1
+#     pre_trained_len = len(pre_trained)
+#     print(('Pre-trained: %d (%.2f%%)' %
+#            (pre_trained_len, pre_trained_len * 100.0 / nwords)))
+#
+#     ''' write oov words '''
+#     with open('oov.txt', 'w') as f:
+#         for w in vw:
+#             if w not in pre_trained:
+#                 f.write(w + '\n')
+#
+#     return embeddings
+#
+#
+# def load_embedding_offline(vw):
+#     """
+#     glove
+#     paragram
+#     """
+#     pre_trained = {}
+#     ndim = 300
+#     nwords = len(vw)
+#     embeddings = np.random.uniform(-0.25, 0.25, (nwords, ndim))
+#     textfile = my_emb_rep['paragram300']
+#     f = open(textfile, 'r')
+#     for line in open(textfile):
+#         sp = line.split()
+#         assert len(sp) == ndim + 1
+#         w = sp[0]
+#         emb = [float(x) for x in sp[1:]]
+#         if w in vw and w not in pre_trained:
+#             embeddings[vw[w]] = emb
+#             pre_trained[w] = 1
+#         pre_trained_len = len(pre_trained)
+#     print(('Pre-trained: %d (%.2f%%)' %
+#            (pre_trained_len, pre_trained_len * 100.0 / nwords)))
+#
+#     ''' write oov words '''
+#     with open('oov.txt', 'w') as f:
+#         for w in vw:
+#             if w not in pre_trained:
+#                 f.write(w + '\n')
+#     return embeddings
+
 
 
 class FileManager(object):

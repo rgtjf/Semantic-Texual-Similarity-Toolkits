@@ -128,9 +128,6 @@ class DictCreater(object):
 
     @_create_dict
     def create_stopwords(self):
-        # stopwords 1: nltk
-        # stopwords = nltk.corpus.stopwords.words('english')
-
         # stopwords 2: zhaojiang's
         # fp = open(config.DICT_DIR + '/english.stopwords.txt', 'r')
         # english_stopwords = [line.strip('\r\n ') for line in fp.readlines()]
@@ -182,7 +179,7 @@ class DictCreater(object):
         print(sentences[:5])
         print(sentence_tags[:5])
 
-        global_idf = utils.IDFCalculator(sentences)
+        global_idf = utils.idf_calculator(sentences)
         return global_idf
 
 

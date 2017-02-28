@@ -15,11 +15,11 @@ class BOWFeature(Feature):
             seqs.append(lemma_sa)
             seqs.append(lemma_sb)
 
-        self.idf_weight = utils.IDFCalculator(seqs)
+        self.idf_weight = utils.idf_calculator(seqs)
 
     def extract(self, train_instance):
         sa, sb = train_instance.get_word(type='lemma', stopwords=self.stopwords, lower=True)
-        features, infos = utils.sequence_vector_features(sa, sb, self.idf_weight)
+        features, infos = utils.sentence_vectorize_features(sa, sb, self.idf_weight)
         return features, infos
 
 
@@ -35,6 +35,6 @@ class BOWGlobalFeature(Feature):
     def extract(self, train_instance):
         idf_weight = dict_utils.DictLoader().load_dict('global_idf')
         sa, sb = train_instance.get_word(type='lemma', stopwords=True, lower=True)
-        features, infos = utils.sequence_vector_features(sa, sb, idf_weight)
+        features, infos = utils.sentence_vectorize_features(sa, sb, idf_weight)
 
         return features, infos

@@ -29,7 +29,7 @@ class IdfAlignmentFeature(Feature):
             seqs.append(lemma_sa)
             seqs.append(lemma_sb)
 
-        self.idf_weight = utils.IDFCalculator(seqs)
+        self.idf_weight = utils.idf_calculator(seqs)
 
     def extract_instances(self, train_instances):
         """ extract features to features """
@@ -103,7 +103,7 @@ class PosAlignmentFeature(Feature):
             seqs.append(lemma_sa)
             seqs.append(lemma_sb)
 
-        self.idf_weight = utils.IDFCalculator(seqs)
+        self.idf_weight = utils.idf_calculator(seqs)
 
     def extract_instances(self, train_instances):
         """ extract features to features """

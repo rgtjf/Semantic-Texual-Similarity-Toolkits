@@ -12,7 +12,7 @@ class POSMatchFeature(Feature):
 
     def extract(self, train_instance):
         pos_sa, pos_sb = train_instance.get_word(type='pos', stopwords=True)
-        features, infos = utils.sequence_match_features(pos_sa, pos_sb)
+        features, infos = utils.sentence_match_features(pos_sa, pos_sb)
         return features, infos
 
 
@@ -23,11 +23,11 @@ class POSVectorFeature(Feature):
             pos_sa, pos_sb = train_instance.get_word(type='pos', stopwords=True)
             seqs.append(pos_sa)
             seqs.append(pos_sb)
-        self.idf_weight = utils.IDFCalculator(seqs)  # idf weight is different
+        self.idf_weight = utils.idf_calculator(seqs)  # idf weight is different
 
     def extract(self, train_instance):
         pos_sa, pos_sb = train_instance.get_word(type='pos', stopwords=True)
-        features, infos = utils.sequence_vector_features(pos_sa, pos_sb, self.idf_weight, convey='count')
+        features, infos = utils.sentence_vectorize_features(pos_sa, pos_sb, self.idf_weight, convey='count')
         return features, infos
 
 
@@ -119,5 +119,5 @@ class POSNounEditFeature(Feature):
         sa = [w for w, ner in pos_sa if ner == 'n']
         sb = [w for w, ner in pos_sb if ner == 'n']
 
-        features, infos = utils.sequence_edit_distance_features(sa, sb)
+        features, infos = utils.sentence_sequence_features(sa, sb)
         return features, infos

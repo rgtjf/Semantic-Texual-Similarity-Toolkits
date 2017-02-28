@@ -112,7 +112,7 @@ class WeightednGramMatchFeature(Feature):
             sa, sb = train_instance.get_word(type=self.type, lower=True)
             seqs.append(sa)
             seqs.append(sb)
-        self.idf_weight = utils.IDFCalculator(seqs)
+        self.idf_weight = utils.idf_calculator(seqs)
 
     def extract(self, train_instance):
         sa, sb = train_instance.get_word(type=self.type, lower=True)
