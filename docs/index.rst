@@ -10,6 +10,8 @@ Welcome to Semantic-Texual-Similarity-Toolkits's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   :maxdepth: 2
+   getting_started.rst
 
 
 Indices and tables

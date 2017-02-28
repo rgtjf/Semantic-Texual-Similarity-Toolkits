@@ -152,6 +152,3 @@ texinfo_documents = [
      author, 'Semantic-Texual-Similarity-Toolkits', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
