@@ -91,7 +91,6 @@ ENV/
 .ropeproject
 /generate/
 /parse/
-/data/
 .tox/
 stst.egg-info/
 ./iclr2016-test/data/

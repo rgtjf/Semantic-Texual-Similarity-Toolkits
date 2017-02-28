@@ -7,7 +7,7 @@
 
 ## Requirements
 - standford CoreNLP 3.6.0
-    - (download)[http://nlp.stanford.edu/software/stanford-corenlp-full-2015-12-09.zip]
+    - [download](http://nlp.stanford.edu/software/stanford-corenlp-full-2015-12-09.zip)
     - Usage
     ```
     $ cd stanford-corenlp-full-2015-12-09/
