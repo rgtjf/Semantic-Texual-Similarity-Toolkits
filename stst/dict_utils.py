@@ -1,11 +1,12 @@
 # coding: utf8
 from __future__ import print_function
 
-import math, os
-import nltk.corpus
-import pyprind
+import math
+import os
 
-from stst import config, utils
+import stst
+import stst.config
+from stst import utils, config
 
 
 @utils.singleton
@@ -13,7 +14,7 @@ class DictLoader(object):
     def __init__(self):
         self.dict_manager = {}
 
-    def load_dict(self, dict_name, path=config.DICT_DIR):
+    def     load_dict(self, dict_name, path=config.DICT_DIR):
         """
         path: config.DICT_DIR
               config.DICT_EX_DIR
@@ -141,44 +142,10 @@ class DictCreater(object):
 
 
     @_create_dict
-    def create_idf(self, train_instances, min_cnt=3):
-
-        process_bar = pyprind.ProgPercent(len(train_instances))
-        word_list = []
-        for train_instance in train_instances:
-            process_bar.update()
-
-            lemma_sa, lemma_sb = train_instance.get_word(type='lemma')
-            words = list(set(lemma_sa))
-            word_list += words
-            words = list(set(lemma_sb))
-            word_list += words
-
-        doc_num = len(train_instances) * 2
-
-        vdist = nltk.FreqDist(word_list)
-
-        # idf_dict: vdist[value>=min_cnt]
-        idf_dict = {}
-        good_keys = [v for v in vdist.keys() if vdist[v] >= min_cnt]
-        for key in good_keys:
-            idf_dict[key] = vdist[key]
-
-        # idf_dict: idf_dict, map
-        for key in idf_dict:
-            idf_dict[key] = math.log(float(doc_num) / float(idf_dict[key])) / math.log(2.)
-
-        return idf_dict
-
-    @_create_dict
-    def create_global_idf(self):
-        from main_tools import get_sts_file_list, get_all_instance
-        file_list = get_sts_file_list()
+    def create_global_idf(self, file_list):
         print('\n'.join(file_list))
-        sentences, sentence_tags = get_all_instance(file_list)
+        sentences, _ = stst.load_sentences(file_list)
         print(sentences[:5])
-        print(sentence_tags[:5])
-
         global_idf = utils.idf_calculator(sentences)
         return global_idf
 

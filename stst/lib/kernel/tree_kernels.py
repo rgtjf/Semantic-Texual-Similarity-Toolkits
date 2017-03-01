@@ -6,8 +6,8 @@ ref
 3. code: http://joedsm.altervista.org/pythontreekernels.htm
 4. wiki: https://en.wikipedia.org/wiki/Tree_kernel
 """
-
-import tree
+from __future__ import print_function
+from stst.lib.kernel import tree
 import math
 from copy import deepcopy
 
@@ -16,10 +16,10 @@ class Kernel():
     def kernel(self,a,b):
         #compute the tree kernel on the trees a and b
         if not isinstance(a, tree.Tree):
-            print "ERROR: first parameter has to be a Tree Object"
+            print("ERROR: first parameter has to be a Tree Object")
             return ""
         if not isinstance(b, tree.Tree):
-            print "ERROR: second parameter has to be a Tree Object"
+            print("ERROR: second parameter has to be a Tree Object")
             return ""
         self.preProcess(a)
         self.preProcess(b)
@@ -28,22 +28,22 @@ class Kernel():
     def preProcess(self,a):
         #Create any data structure useful for computing the kernel
         #To be instantiated in subclasses
-        print "ERROR: prepProcess() must be executed in subclasses"
+        print("ERROR: prepProcess() must be executed in subclasses")
         pass
 
     def evaluate(self,a,b):
         #To be instantiated in subclasses
-        print "ERROR: evaluated() must be executed in subclasses"
+        print("ERROR: evaluated() must be executed in subclasses")
         pass
 
     def printKernelMatrix(self,dataset):
         if not isinstance(dataset, tree.Dataset):
-            print "ERROR: the first Parameter must be a Dataset object"
+            print("ERROR: the first Parameter must be a Dataset object")
             return
         ne = len(dataset)
         for i in range(ne):
             for j in range(i,ne):
-                print "%d %d %.2f" % (i, j, self.kernel(dataset.getExample(i), dataset.getExample(j)))
+                print("%d %d %.2f" % (i, j, self.kernel(dataset.getExample(i), dataset.getExample(j))))
 
 class KernelST(Kernel):
     def __init__(self,l,savememory=1,hashsep="#"):
@@ -376,7 +376,7 @@ class KernelPdakFast(KernelPdak):
         a = tree.SubtreePositionIDSubtreeIDSubtreeSizeListLabel(t.root)
         t.kernelpdakrepr = (a.sids, a.pinv)
 
-    def mergetrees_with_depth_del_labels(self,(tree1,labels1),(tree2,labels2)):
+    def mergetrees_with_depth_del_labels(self, tree1,labels1, tree2,labels2):
         merge = {}
         match = 0
         for key in tree1:
@@ -429,7 +429,7 @@ class KernelPdakFast(KernelPdak):
                                 for tmpkey in jtree[startkey][0]:
                                     # calcolo kernel                                                                                                      
                                     if tmpkey in jtree[max_size[1]][1]:
-                                        if gamma_par <> 1.0:
+                                        if gamma_par != 1.0:
                                             tmpk  = tmpk + (gamma_par**(depth+1) - gamma_par)/(gamma_par - 1)*lambda_par**tmpkey[1]*jtree[startkey][0][tmpkey]*jtree[max_size[1]][1][tmpkey] 
                                         else: tmpk  = tmpk + depth*lambda_par**tmpkey[1]*jtree[startkey][0][tmpkey]*jtree[max_size[1]][1][tmpkey]
                                     # fine calcolo kernel, inizio inserimento
@@ -437,7 +437,7 @@ class KernelPdakFast(KernelPdak):
                                 for tmpkey in jtree[startkey][1]:
                                     # calcolo kernel                                                                                                      
                                     if tmpkey in jtree[max_size[1]][0]:
-                                        if gamma_par <> 1.0:
+                                        if gamma_par != 1.0:
                                             tmpk  = tmpk + (gamma_par**(depth+1) - gamma_par)/(gamma_par - 1)*lambda_par**tmpkey[1]*jtree[startkey][1][tmpkey]*jtree[max_size[1]][0][tmpkey]
                                         else: tmpk  = tmpk + depth*lambda_par**tmpkey[1]*jtree[startkey][1][tmpkey]*jtree[max_size[1]][0][tmpkey]
                                     # fine calcolo kernel, inizio inserimento                                                                             
@@ -457,7 +457,7 @@ class KernelPdakFast(KernelPdak):
                     for tmpkey in jtree[node][0]:
                         # calcolo kernel                                                                                                                  
                         if tmpkey in jtree[max_size[1]][1]:
-                            if gamma_par <> 1.0:
+                            if gamma_par != 1.0:
                                 tmpk  = tmpk + (gamma_par**(depth+1) - gamma_par)/(gamma_par - 1)*lambda_par**tmpkey[1]*math.exp(-param*depth)*jtree[max_size[1]][1][tmpkey]
                             else: tmpk  = tmpk + depth*lambda_par**tmpkey[1]*math.exp(-param*depth)*jtree[max_size[1]][1][tmpkey]
                         # fine calcolo kernel, inizio inserimento 
@@ -468,7 +468,7 @@ class KernelPdakFast(KernelPdak):
                     for tmpkey in jtree[node][1]:
                         # calcolo kernel                                                                                      
                         if tmpkey in jtree[max_size[1]][0]:
-                            if gamma_par <> 1.0:
+                            if gamma_par != 1.0:
                                 tmpk  = tmpk + (gamma_par**(depth+1) - gamma_par)/(gamma_par - 1)*lambda_par**tmpkey[1]*math.exp(-param*depth)*jtree[max_size[1]][0][tmpkey]
                             else: tmpk  = tmpk + depth*lambda_par**tmpkey[1]*math.exp(-param*depth)*jtree[max_size[1]][0][tmpkey]
                         # fine calcolo kernel, inizio inserimento 
@@ -484,7 +484,7 @@ class KernelPdakFast(KernelPdak):
                 if jtree[node][0] is not {} and jtree[node][1] is not {}:
                     for tmpkey in jtree[node][0]:
                         if tmpkey in jtree[node][1]:
-                            if gamma_par <> 1.0:
+                            if gamma_par != 1.0:
                                 tmpk  = tmpk + (gamma_par**(depth+1) - gamma_par)/(gamma_par - 1)*lambda_par**tmpkey[1]*jtree[node][0][tmpkey]*jtree[node][1][tmpkey]
                             else: tmpk  = tmpk + depth*lambda_par**tmpkey[1]*jtree[node][0][tmpkey]*jtree[node][1][tmpkey]
         return kvalue + tmpk*math.exp(2*param*depth)

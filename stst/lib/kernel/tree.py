@@ -2,7 +2,7 @@
 """
 A set of Classes to handle trees and compute kernel functions on them
 """
-
+from __future__ import print_function
 import random
 import bisect
 
@@ -169,7 +169,7 @@ class TreeNode:
 
     def getDepth(self):
         if not hasattr(self, 'depth'):
-            print "ERROR: node depth has not been computed!"
+            print("ERROR: node depth has not been computed!")
             return ""
         return self.depth
 
@@ -224,7 +224,7 @@ class TreeNode:
         if not self: return
         stri = self.val
         if stri.find(sep) != -1:
-            print "ERROR: identifier " + sep + "used in label. Please set it with setHashSep(newsep)"
+            print("ERROR: identifier " + sep + "used in label. Please set it with setHashSep(newsep)")
         for c in self.chs:
             stri += sep + c.setHashSubtreeIdentifier(sep)
         self.subtreeId = str(hash(stri))

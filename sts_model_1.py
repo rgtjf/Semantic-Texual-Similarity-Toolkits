@@ -1,18 +1,22 @@
 # coding: utf8
 from __future__ import print_function
 
-from features_align import *
-from features_basic import *
-from features_dependency import *
+from classifier import *
+import config
+import data_utils
+import sentpair
+from features_ngram import *
 from features_embedding import *
-from features_mt import *
+from features_sequence import *
+from features_dependency import *
 from features_nn import *
 from features_pos import *
-from features_sequence import *
 from features_tree_kernels import *
-
-from stst.features.features_ngram import *
-from stst.model import Model
+from features_align import *
+from features_mt import *
+from features_basic import *
+from model import Model
+from main_tools import *
 
 
 
@@ -20,7 +24,7 @@ from stst.model import Model
 if __name__ == '__main__':
 
     sklearn_gb = Classifier(sklearn_GB())
-    model_gb = Model('S1-gb', sklearn_gb)
+    model_gb = Model('STS-gb', sklearn_gb)
     model = model_gb
 
     model.add(nLemmaGramOverlapFeature())
@@ -60,10 +64,15 @@ if __name__ == '__main__':
     model.add(MinAvgMaxEmbeddingFeature(emb_type='glove', dim=100, load=True))
     model.add(MinAvgMaxEmbeddingFeature(emb_type='glove300', dim=300, load=True))
 
-    train_en(model)
-    test_en(model)
-    predict_en_sample(model)
 
-    predict_en(model, dev_flag=False)
-    predict_snli(model, dev_flag=False)
-    predict_wmt(model, dev_flag=False)
+    train_sts(model, flag=False)
+    test_sts(model, flag=False)
+    predict_sts(model, flag=False)
+
+    # train_en(model)
+    # test_en(model)
+    # predict_en_sample(model)
+    #
+    # predict_en(model, dev_flag=False)
+    # predict_snli(model, dev_flag=False)
+    # predict_wmt(model, dev_flag=False)

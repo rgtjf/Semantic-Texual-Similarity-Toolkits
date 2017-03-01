@@ -79,38 +79,6 @@ class POSLemmaMatchFeature(Feature):
         return features, infos
 
 
-class POSNounEmbeddingFeature(Feature):
-    def __init__(self, emb_type, dim, lower=True, **kwargs):
-        super(POSNounEmbeddingFeature, self).__init__(**kwargs)
-        self.lower = lower
-        if 'emb_type' is None:
-            print('please init with emb_type and dimension!')
-            exit()
-        self.emb_type = emb_type
-        self.dim = dim
-        self.feature_name = self.feature_name + '-%s' % (emb_type)
-
-    def extract(self, train_instance):
-        from features_embedding import minavgmaxpooling
-
-        emb_type = self.emb_type
-        dim = self.dim
-
-        pos_sa, pos_sb = train_instance.get_pos_tag(stopwords=False)
-        # noun_sa: [ [I, NN], [love, VP], [Shanghai, NNJ] ]
-
-        sa = [w for w, ner in pos_sa if ner == 'n']
-        sb = [w for w, ner in pos_sb if ner == 'n']
-
-        pooling_vec_sa = minavgmaxpooling(sa, emb_type, dim)
-        pooling_vec_sb = minavgmaxpooling(sb, emb_type, dim)
-        all_feats, all_names = vk.get_all_kernel(pooling_vec_sa, pooling_vec_sb)
-        features = all_feats
-
-        infos = [sa, sb]
-        return features, infos
-
-
 class POSNounEditFeature(Feature):
     def extract(self, train_instance):
         pos_sa, pos_sb = train_instance.get_pos_tag(stopwords=False)
@@ -120,4 +88,45 @@ class POSNounEditFeature(Feature):
         sb = [w for w, ner in pos_sb if ner == 'n']
 
         features, infos = utils.sentence_sequence_features(sa, sb)
+        return features, infos
+
+
+class POSNounEmbeddingFeature(Feature):
+    def __init__(self, emb_name, dim, emb_file, binary=False, **kwargs):
+        super(POSNounEmbeddingFeature, self).__init__(**kwargs)
+        self.emb_name = emb_name
+        self.dim = dim
+        self.emb_file = emb_file
+        self.binary = binary
+
+        self.feature_name = self.feature_name + '-%s' % (emb_name)
+
+    def extract_information(self, train_instances):
+        seqs = []
+        for train_instance in train_instances:
+            pos_sa, pos_sb = train_instance.get_pos_tag(stopwords=False)
+            sa = [w for w, tag in pos_sa if tag == 'n']
+            sb = [w for w, tag in pos_sb if tag == 'n']
+            seqs.append(sa)
+            seqs.append(sb)
+
+        self.idf_weight = utils.idf_calculator(seqs)
+        self.word2index = {word:index for index, word in enumerate(self.idf_weight.keys())}
+        self.embeddings = utils.load_word_embedding(self.word2index, self.emb_file, self.dim, self.binary)
+
+    def extract(self, train_instance):
+        from stst.features.features_embedding import minavgmaxpooling
+
+        pos_sa, pos_sb = train_instance.get_pos_tag(stopwords=False)
+        sa = [w for w, tag in pos_sa if tag == 'n']
+        sb = [w for w, tag in pos_sb if tag == 'n']
+
+        pooling_vec_sa = minavgmaxpooling(sa, self.word2index, self.embeddings, self.dim,
+                                          convey='idf', idf_weight=self.idf_weight)
+        pooling_vec_sb = minavgmaxpooling(sb, self.word2index, self.embeddings, self.dim,
+                                          convey='idf', idf_weight=self.idf_weight)
+        all_feats, all_names = vk.get_all_kernel(pooling_vec_sa, pooling_vec_sb)
+        features = all_feats
+
+        infos = [self.emb_name]
         return features, infos

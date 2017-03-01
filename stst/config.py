@@ -16,7 +16,10 @@ MODEL_DIR = GENERATE_DIR + '/models'
 RECORD_DIR = GENERATE_DIR + '/records'
 
 
-RESOURCE = 'resources'
+''' tmp config '''
+TMP_DIR = '/generate' + '/tmp'
+
+RESOURCE = './stst/resources'
 ''' dict config '''
 DICT_DIR = RESOURCE
 

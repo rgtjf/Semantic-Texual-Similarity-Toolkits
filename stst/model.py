@@ -1,9 +1,10 @@
 # coding: utf8
 from __future__ import print_function
 
-import random, os
+import os
+import random
 
-from stst import config, utils
+from stst import utils, config
 from stst.features.features import Feature
 
 

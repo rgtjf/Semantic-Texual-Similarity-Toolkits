@@ -13,8 +13,6 @@ from features_remove_nonlinear_kernel import *
 from features_sequence import *
 from features_tree_kernels import *
 
-from stst.main.main_tools import *
-
 if __name__ == '__main__':
 
 

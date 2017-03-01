@@ -12,12 +12,16 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
-from features import Feature
 from stst import utils, config
+from stst.features.features import Feature
 
 
 class AsiyaDriver(object):
     def __init__(self):
+        'stst\resources\linux\chromedriver'
+        # cur_dir = os.path.dirname(__file__) # 'stst/features'
+        # path = os.path.join(cur_dir, 'resources')
+        # print(cur_dir)
         driver = webdriver.Chrome()
         driver.get("http://asiya.cs.upc.edu/demo/asiya_online.php#")
         time.sleep(3)
@@ -92,6 +96,9 @@ class AsiyaDriver(object):
 
     def run_file(self, src='sa.txt', sys='sb.txt'):
         ''' write to file sa.txt, sb.txt'''
+        cur_dir = os.path.dirname(__file__)  # 'stst/features'
+        # path = os.path.join(cur_dir, 'resources')
+        print(cur_dir)
 
         driver = self.driver
         wait = 3
@@ -99,19 +106,21 @@ class AsiyaDriver(object):
             elem = driver.find_element_by_id("srcupload")
             elem.click()
             time.sleep(wait)
-            os.system("upload_sa.exe")
+            cmd = r'stst\features\upload.exe '
+            os.system(cmd + src)
             time.sleep(wait)
 
             elem = driver.find_element_by_id("sysupload")
             elem.click()
             time.sleep(wait)
-            os.system("upload_sb.exe")
+
+            os.system(cmd + sys)
             time.sleep(wait)
 
             elem = driver.find_element_by_id("refupload")
             elem.click()
             time.sleep(wait)
-            os.system("upload_sa.exe")
+            os.system(cmd + src)
             time.sleep(wait)
 
             elem = driver.find_element_by_id("submitbtndoasiya")
@@ -168,8 +177,8 @@ class AsiyaMTFeature(Feature):
 
             while True:
                 ''' sa -> sb '''
-                f_sa = utils.create_write_file(config.EX_DICT_DIR + '/sa.txt')
-                f_sb = utils.create_write_file(config.EX_DICT_DIR + '/sb.txt')
+                f_sa = utils.create_write_file(config.TMP_DIR + '/sa.txt')
+                f_sb = utils.create_write_file(config.TMP_DIR + '/sb.txt')
                 for id in range(st, ed):
                     lemma_sa, lemma_sb = train_instances[id].get_word(type='lemma')
                     lemma_sa = ' '.join(lemma_sa)
@@ -187,8 +196,9 @@ class AsiyaMTFeature(Feature):
 
             while True:
                 ''' sb -> sa '''
-                f_sa = utils.create_write_file(config.EX_DICT_DIR + '/sb.txt')
-                f_sb = utils.create_write_file(config.EX_DICT_DIR + '/sa.txt')
+                f_sa = utils.create_write_file(config.TMP_DIR + '/sb.txt')
+                f_sb = utils.create_write_file(config.TMP_DIR + '/sa.txt')
+                # "F:\PyCharmWorkSpace\SemEval17_T1_System\resources\external_dict\sa.txt"
                 for id in range(st, ed):
                     lemma_sa, lemma_sb = train_instances[id].get_word(type='lemma')
                     lemma_sa = ' '.join(lemma_sa)

@@ -1,7 +1,7 @@
 import nltk
 import numpy as np
 
-from features import Feature
+from stst.features.features import Feature
 from stst.lib.kernel import vector_kernel as vk
 from stst import utils
 

@@ -6,8 +6,7 @@
 - python test.py
 
 ## Requirements
-- standford CoreNLP 3.6.0
-    - [download](http://nlp.stanford.edu/software/stanford-corenlp-full-2015-12-09.zip)
+- standford CoreNLP 3.6.0 [download](http://nlp.stanford.edu/software/stanford-corenlp-full-2015-12-09.zip)
     - Usage
     ```
     $ cd stanford-corenlp-full-2015-12-09/
@@ -28,6 +27,12 @@
 - theano, lasagne, dl scores
 
 ## Usage
-```python
-$ python test.py
-```
+    ```python
+    $ python test.py
+    ```
+
+## Embedding Feautures
+
+
+## Machine Translation Features
+- chromedriver 2.27 (download)[https://chromedriver.storage.googleapis.com/index.html?path=2.27/]

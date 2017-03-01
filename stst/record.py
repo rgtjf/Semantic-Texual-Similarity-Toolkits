@@ -2,9 +2,10 @@
 from __future__ import print_function
 
 import csv
+
 import numpy as np
 
-from stst import config, utils
+from stst import utils, config
 
 
 def record(record_file, dev_pearsonr, test_pearsonr, model):

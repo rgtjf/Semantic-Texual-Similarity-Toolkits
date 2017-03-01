@@ -363,7 +363,7 @@ if __name__ == '__main__':
 
     feats, names = get_all_kernel(X, Y)
     for name, feat in zip(names, feats):
-        print name, feat
+        print(name, feat)
         '''
         ('euclidean', 2)
         ('cosine', 1.0)

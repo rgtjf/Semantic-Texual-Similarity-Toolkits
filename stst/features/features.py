@@ -1,10 +1,13 @@
 # coding: utf8
 from __future__ import print_function
 
-import json, pyprind
+import json
 import os
 
+import pyprind
+
 from stst import utils, config
+
 
 class Feature(object):
     def __init__(self,

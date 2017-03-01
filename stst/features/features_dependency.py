@@ -1,4 +1,4 @@
-from features import Feature
+from stst.features.features import Feature
 from stst import utils
 
 

@@ -1,13 +1,13 @@
 # coding: utf8
 from __future__ import print_function
 
-import codecs, os
-import traceback
-
+import codecs
 import json
+import os
+
 import pyprind
 
-from stst import utils, config
+from stst import utils
 from stst.data_tools.sent_pair import SentPair
 
 
@@ -38,7 +38,8 @@ def load_STS(train_file):
             data.append((sa, sb, score))
     return data
 
-def load_parse_data(train_file, nlp, flag=False):
+
+def load_parse_data(train_file, nlp=None, flag=False):
     """
     Load data after Parse, like POS, NER, etc.
     Value: [ SentPair:class, ... ]
@@ -56,6 +57,8 @@ def load_parse_data(train_file, nlp, flag=False):
     if flag or not os.path.isfile(parse_train_file):
 
         print(train_file)
+        if nlp is None:
+            raise RuntimeError("nlp should be init by nlp = stst.StanfordNLP('http://localhost:9000')")
 
         ''' Parse Data '''
         data = load_STS(train_file)
@@ -88,3 +91,30 @@ def load_parse_data(train_file, nlp, flag=False):
 
     print("Load Data, train_file=%s, n_train=%d\n" % (train_file, len(parse_data)))
     return parse_data
+
+def load_sentences(file_list, type='lemma'):
+    """
+    sentence_dict['file'][idx]['sa'] = idx
+    sentence_dict['file'][idx]['sb'] = idx+1
+    """
+    sentence_tags = []
+    sentences = []
+    for file in file_list:
+        # file is path
+        file_name = file.split('/')[-1]
+        parse_data = load_parse_data(file, None)
+        for idx, train_instance in enumerate(parse_data):
+            if type == 'lemma':
+                sa, sb = train_instance.get_word(type='lemma', stopwords=False, lower=True)
+            elif type == 'word' :
+                sa, sb = train_instance.get_word(type='word')
+            sa_tag = "%s_%d_sa" % (file_name, idx)
+            sb_tag = "%s_%d_sb" % (file_name, idx)
+
+            sentences.append(sa)
+            sentence_tags.append(sa_tag)
+
+            sentences.append(sb)
+            sentence_tags.append(sb_tag)
+
+    return sentences, sentence_tags
