@@ -1,18 +1,15 @@
 # Semantic Textual Similarity Toolkits
 
-## Usage
-- download the repo
-- run the corenlp server
-- python test.py
-
-## Requirements
-- standford CoreNLP 3.6.0 [download](http://nlp.stanford.edu/software/stanford-corenlp-full-2015-12-09.zip)
+## Installration
+1. download the repo
+2. run the corenlp server
+   standford CoreNLP 3.6.0 [download](http://nlp.stanford.edu/software/stanford-corenlp-full-2015-12-09.zip)
     - Usage
     ```
     $ cd stanford-corenlp-full-2015-12-09/
     $ java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer')
     ```
-- python
+3. python
     - requirements.txt
     - Usage
     ```
@@ -22,17 +19,20 @@
     ```
     $ python -m nltk.downloader stopwords
     ```
-## TODO
-- chrome driver, to caputure mt features
-- theano, lasagne, dl scores
+4. Run
 
-## Usage
-    ```python
-    $ python test.py
+    ```
+    $python test.py
     ```
 
-## Embedding Feautures
+## TODO
+- chrome driver, to caputure mt features
+- theano, lasagne, deep learning scores
 
+
+## Embedding Feautures
+- Pre-trained Embedding
 
 ## Machine Translation Features
-- chromedriver 2.27 (download)[https://chromedriver.storage.googleapis.com/index.html?path=2.27/]
+- chromedriver 2.27 [download](https://chromedriver.storage.googleapis.com/index.html?path=2.27/)
+- autoit

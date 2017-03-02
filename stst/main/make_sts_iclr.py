@@ -1,4 +1,8 @@
-import data_utils, utils, config
+import data_utils
+import utils
+
+from stst import config
+
 
 def make(train_instance):
     sa, sb = train_instance.get_word(type='lemma', stopwords=False, lower=False)

@@ -1,14 +1,8 @@
 # coding: utf8
 from __future__ import print_function
+import stst
 
-from classifier import *
-from features_nn import *
 
-from features_basic import *
-from model import Model
-from main_tools import *
-from data_tools import *
-import config
 
 
 

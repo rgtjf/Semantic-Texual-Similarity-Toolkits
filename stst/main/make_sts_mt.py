@@ -2,9 +2,10 @@
 from __future__ import print_function
 
 from classifier import *
+from data_utils import *
 from features_mt import *
 from model import Model
-from data_utils import *
+
 from main_tools import *
 
 if __name__ == '__main__':
