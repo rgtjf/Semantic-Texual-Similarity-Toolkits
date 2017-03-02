@@ -22,12 +22,14 @@
 4. Run
 
     ```
-    $python test.py
+    $python example.py
     ```
 
 ## TODO
 - chrome driver, to caputure mt features
 - theano, lasagne, deep learning scores
+   - stst/main/make_sts_nn.py
+   - stst/main/make_sts_iclr.py
 
 
 ## Embedding Feautures
