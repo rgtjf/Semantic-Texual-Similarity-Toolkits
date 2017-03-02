@@ -1,6 +1,6 @@
 # Semantic Textual Similarity Toolkits
 
-## Installration
+## Installation
 1. download the repo
 2. run the corenlp server
    standford CoreNLP 3.6.0 [download](http://nlp.stanford.edu/software/stanford-corenlp-full-2015-12-09.zip)
