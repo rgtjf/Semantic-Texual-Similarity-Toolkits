@@ -1,5 +1,5 @@
-import data_utils
-import utils
+from stst import dict_utils, utils
+from stst.data_tools import data_utils
 
 from stst import config
 
