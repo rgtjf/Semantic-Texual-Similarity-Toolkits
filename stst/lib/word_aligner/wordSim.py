@@ -2,14 +2,14 @@ import os
 from stst.lib.word_aligner.config import *
 
 ################################################################################
-def loadPPDB(ppdbFileName = 'Resources/ppdb-1.0-xxxl-lexical.extended.synonyms.uniquepairs'):
+def loadPPDB(ppdbFileName = 'stst/lib/word_aligner/Resources/ppdb-1.0-xxxl-lexical.extended.synonyms.uniquepairs'):
     global ppdbSim
     global ppdbDict
 
     count = 0
 
-    cur_dir = os.path.dirname(__file__)
-    ppdbFileName = os.path.join(cur_dir, ppdbFileName)
+    # cur_dir = os.path.dirname(__file__)
+    # ppdbFileName = os.path.join(cur_dir, ppdbFileName)
 
     ppdbFile = open(ppdbFileName, 'r')
     for line in ppdbFile:
@@ -30,7 +30,7 @@ def presentInPPDB(word1, word2):
         return True
     if (word2.lower(), word1.lower()) in ppdbDict:
         return True
-    
+
 ################################################################################
 
 
@@ -47,15 +47,15 @@ def wordRelatedness(word1, pos1, word2, pos2):
         canonicalWord1 = canonicalWord1.replace(',', '')
     else:
         canonicalWord1 = word1
-        
+
     if len(word2) > 1:
         canonicalWord2 = word2.replace('.', '')
         canonicalWord2 = canonicalWord2.replace('-', '')
         canonicalWord2 = canonicalWord2.replace(',', '')
     else:
         canonicalWord2 = word2
-    
-    
+
+
     if canonicalWord1.lower() == canonicalWord2.lower():
         return 1
 
