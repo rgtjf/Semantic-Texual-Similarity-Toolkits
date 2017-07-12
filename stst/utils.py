@@ -253,8 +253,7 @@ def idf_calculator(sentence_list, min_cnt=1):
     return idf_dict
 
 
-def vectorize(sentence, idf_weight, convey='idf'):
-    word2index = {word: i for i, word in enumerate(idf_weight.keys())}
+def vectorize(sentence, idf_weight, word2index, convey='idf'):
     vec = [float(0)] * len(word2index)
     for word in sentence:
         if word not in word2index:
@@ -337,8 +336,9 @@ def sentence_vectorize_features(sa, sb, idf_weight, convey='idf'):
        to achieve this, idf_weight format should be the same with seq1
        e.g., train_instance.get_word(type='lemma', lower=True)
     """
-    vec1 = vectorize(sa, idf_weight)
-    vec2 = vectorize(sb, idf_weight)
+    word2index = {word: i for i, word in enumerate(idf_weight.keys())}
+    vec1 = vectorize(sa, idf_weight, word2index)
+    vec2 = vectorize(sb, idf_weight, word2index)
     features, info = vector_similarity(vec1, vec2)
 
     info = ['linear_kernel', 'stat_kernel', 'non-linear_kernal',
