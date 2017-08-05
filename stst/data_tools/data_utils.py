@@ -28,18 +28,7 @@ def load_data(train_file):
     return data
 
 
-def load_STS(train_file):
-    with utils.create_read_file(train_file) as f:
-        data = []
-        for line in f:
-            line = line.strip().split('\t')
-            score = float(line[4])
-            sa, sb = line[5], line[6]
-            data.append((sa, sb, score))
-    return data
-
-
-def load_parse_data(train_file, nlp=None, flag=False):
+def load_parse_data(train_file, flag=False):
     """
     Load data after Parse, like POS, NER, etc.
     Value: [ SentPair:class, ... ]
@@ -47,32 +36,24 @@ def load_parse_data(train_file, nlp=None, flag=False):
         flag: False(Default), Load from file (resources....)
               True, Parse and Write to file, and then load from file
     """
+
     ''' Pre-Define Write File '''
-
-    # parse_train_file = config.PARSE_DIR + '/' + \
-    #                    utils.FileManager.get_file(train_file)
-
     parse_train_file = train_file.replace('./data', './generate/parse')
 
     if flag or not os.path.isfile(parse_train_file):
 
-        print(train_file)
-        if nlp is None:
-            raise RuntimeError("nlp should be init by nlp = stst.StanfordNLP('http://localhost:9000')")
-
         ''' Parse Data '''
-        data = load_STS(train_file)
+        parse_data = []
+        data = load_data(train_file)
 
         print('*' * 50)
-        print("Parse Data, train_file=%s, n_train=%d\n" % (train_file, len(data)))
+        print("Parse Data, train_file={}, n_train={:d}".format(train_file, len(data)))
 
-        parse_data = []
         process_bar = pyprind.ProgPercent(len(data))
         for (sa, sb, score) in data:
             process_bar.update()
-            parse_sa = nlp.parse(sa)
-            parse_sb = nlp.parse(sb)
-            parse_data.append((parse_sa, parse_sb, score))
+            dict_pair = {'sa': sa, 'sb': sb, 'score': score}
+            parse_data.append(dict_pair)
 
         ''' Write Data to File '''
         with utils.create_write_file(parse_train_file) as f_parse:
@@ -86,35 +67,8 @@ def load_parse_data(train_file, nlp=None, flag=False):
     with utils.create_read_file(parse_train_file) as f:
         for line in f:
             parse_json = json.loads(line)
-            sentpair_instance = SentPair(parse_json)
-            parse_data.append(sentpair_instance)
+            sentpair = SentPair(parse_json)
+            parse_data.append(sentpair)
 
-    print("Load Data, train_file=%s, n_train=%d\n" % (train_file, len(parse_data)))
+    print("Load Data, train_file={}, n_train={:d}\n".format(train_file, len(parse_data)))
     return parse_data
-
-def load_sentences(file_list, type='lemma'):
-    """
-    sentence_dict['file'][idx]['sa'] = idx
-    sentence_dict['file'][idx]['sb'] = idx+1
-    """
-    sentence_tags = []
-    sentences = []
-    for file in file_list:
-        # file is path
-        file_name = file.split('/')[-1]
-        parse_data = load_parse_data(file, None)
-        for idx, train_instance in enumerate(parse_data):
-            if type == 'lemma':
-                sa, sb = train_instance.get_word(type='lemma', stopwords=False, lower=True)
-            elif type == 'word' :
-                sa, sb = train_instance.get_word(type='word')
-            sa_tag = "%s_%d_sa" % (file_name, idx)
-            sb_tag = "%s_%d_sb" % (file_name, idx)
-
-            sentences.append(sa)
-            sentence_tags.append(sa_tag)
-
-            sentences.append(sb)
-            sentence_tags.append(sb_tag)
-
-    return sentences, sentence_tags

@@ -25,9 +25,11 @@ class Model(object):
 
         self.model_file = config.MODEL_DIR + '/' + self.model_name + '.pkl'
 
-        self.output_file = None  # config.OUTPUT_DIR + '/' + self.model_name + '.output.txt'
+        # config.OUTPUT_DIR + '/' + self.model_name + '.output.txt'
+        self.output_file = None
 
-        self.get_output_file = lambda train_file: config.OUTPUT_DIR + '/' + self.model_name + '/' + os.path.basename(train_file)
+        self.get_output_file = lambda train_file: '{}/{}/{}'.format(
+            config.OUTPUT_DIR, self.model_name, os.path.basename(train_file))
 
 
     def add(self, feature):
@@ -59,7 +61,7 @@ class Model(object):
 
         f_out = utils.create_write_file(self.output_file)
         for label, train_instances in zip(predict_label, train_instances):
-            print('%.2f\t#\t%s' % (label, train_instances.get_instance_string()), file=f_out)
+            print('{:.2f}\t#\t{}'.format(label, train_instances.get_instance_string()), file=f_out)
 
         return self.classifier
 
@@ -77,7 +79,7 @@ class Model(object):
 
         f_out = utils.create_write_file(self.output_file)
         for label, dev_instance in zip(predict_label, dev_instances):
-            print('%.2f\t#\t%s' % (label, dev_instance.get_instance_string()), file=f_out)
+            print('{:.2f}\t#\t{}'.format(label, dev_instance.get_instance_string()), file=f_out)
 
         return predict_label
 
@@ -97,7 +99,7 @@ class Model(object):
         for feature_class in self.feature_list:
             if isinstance(feature_class, Feature):
                 feature_string, feature_dimension, n_instance = \
-                    feature_class.extract_dataset_instances(train_instances, train_file)
+                    feature_class.extract_dataset_instances(train_instances, train_file, not dev)
                 feature_strings.append(feature_string)
                 feature_dimensions.append(feature_dimension)
                 sum_feature_dimension += feature_dimension
@@ -167,6 +169,8 @@ class Model(object):
         n_batch = n_data // k_fold
         data_instances = list(zip(range(n_data), data_instances))
 
+        print(n_data)
+
         id_map = range(n_data)
         if shuffle is True:
             random.shuffle(id_map)
@@ -178,29 +182,30 @@ class Model(object):
             if ed > n_data:
                 ed = n_data
 
-            data = utils.create_read_file(self.dev_feature_file).readlines()
-
+            data = utils.create_read_file(self.train_feature_file).readlines()
+            print(len(data))
             # make train data
             train = [data[id_map[idx]].strip() for idx in range(len(data)) if idx not in range(st, ed)]
-            dev_feature_file_train = self.dev_feature_file.replace('txt', 'train')
-            f_train = utils.create_write_file(dev_feature_file_train)
+            data_feature_file_train = self.train_feature_file.replace('txt', 'train')
+            f_train = utils.create_write_file(data_feature_file_train)
             print('\n'.join(train), file=f_train)
             f_train.close()
 
             # make dev data
             dev = [data[id_map[idx]].strip() for idx in range(st, ed)]
-            dev_feature_file_dev = self.dev_feature_file.replace('txt', 'dev')
-            f_dev = utils.create_write_file(dev_feature_file_dev)
+            data_feature_file_dev = self.train_feature_file.replace('txt', 'dev')
+            f_dev = utils.create_write_file(data_feature_file_dev)
             print('\n'.join(dev), file=f_dev)
             f_dev.close()
 
             ''' Train Classifier '''
-            self.classifier.train_model(dev_feature_file_train, self.model_file)  # Attention! self.dev_feature_file
+            # Attention! self.dev_feature_file
+            self.classifier.train_model(data_feature_file_train, self.model_file)
 
             ''' Predict Lables'''
             self.output_file = self.get_output_file(data_file)
 
-            predict_label = self.classifier.test_model(dev_feature_file_dev, self.model_file, self.output_file)
+            predict_label = self.classifier.test_model(data_feature_file_dev, self.model_file, self.output_file)
 
             for idx in range(st, ed):
                 idy = idx - st
@@ -211,4 +216,5 @@ class Model(object):
 
         f_out = utils.create_write_file(self.output_file)
         for label, train_instance in zip(preds, data_instances):
-            print('%.2f\t#\t%s' % (label, train_instance[1].get_instance_string()), file=f_out)
+            print('{:.2f}\t#\t{}'.format(
+                label, train_instance[1].get_instance_string()), file=f_out)

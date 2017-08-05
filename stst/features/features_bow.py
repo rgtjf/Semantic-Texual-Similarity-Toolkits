@@ -1,6 +1,18 @@
 from stst.features.features import Feature
 from stst import dict_utils, utils
 
+class BOWFeature(Feature):
+
+    def __init__(self):
+        pass
+
+
+    def extract_information(self, train_instances):
+        pass
+
+    def extract(self, train_instance):
+        pass
+
 
 class BOWFeature(Feature):
     def __init__(self, stopwords=True, **kwargs):

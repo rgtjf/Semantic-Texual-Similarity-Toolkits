@@ -46,14 +46,30 @@ PAIRWISE_KERNEL_FUNCTIONS = {
 
 
 """
+from __future__ import print_function
 
 import numpy as np
 import scipy.stats
 from sklearn.metrics.pairwise import additive_chi2_kernel
 
+
+def check_pairwise_vector(v1, v2):
+    if isinstance(v1, list):
+        v1 = np.array(v1)
+    if isinstance(v2, list):
+        v2 = np.array(v2)
+    if v1.shape != v2.shape:
+        raise ValueError("v1 and v2 should be of same shape. They were "
+                         "respectively %r and %r long." % (v1.shape, v2.shape))
+    return v1, v2
+
+def normalize(v):
+    norm = np.linalg.norm(v)
+    if norm == 0:
+        return v
+    return v / norm
+
 ''' Linear Kernel '''
-
-
 def cosine_distance(v1, v2):
     """
 
@@ -257,17 +273,6 @@ NonLinearKernel = {
 }
 
 
-def check_pairwise_vector(v1, v2):
-    if isinstance(v1, list):
-        v1 = np.array(v1)
-    if isinstance(v2, list):
-        v2 = np.array(v2)
-
-    if v1.shape != v2.shape:
-        raise ValueError("v1 and v2 should be of same shape. They were "
-                         "respectively %r and %r long." % (v1.shape, v2.shape))
-    return v1, v2
-
 
 def get_linear_kernel(v1, v2):
     linear_kernel_feats = []
@@ -338,14 +343,6 @@ def get_all_kernel(v1, v2):
     all_names = linear_kernel_names + stat_kernel_names + non_linear_names
 
     return all_feats, all_names
-
-
-def normalize(v):
-    norm = np.linalg.norm(v)
-    if norm == 0:
-        return v
-    return v / norm
-
 
 if __name__ == '__main__':
 

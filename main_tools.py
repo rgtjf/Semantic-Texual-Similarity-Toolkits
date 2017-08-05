@@ -58,5 +58,8 @@ def hill_climbing(model, choose_list=[]):
                                                                   feature_list[chooseIndex].feature_name))
 
 
+def ablation_study():
+    pass
+
 if __name__ == '__main__':
     pass
