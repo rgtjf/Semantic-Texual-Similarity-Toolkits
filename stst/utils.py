@@ -1,7 +1,17 @@
 # coding:utf8
 """
 @author rgtjf
-@update 170804
+
+@Update 170811
+==============
+1. ADD      load_embedding_from_text
+    - from raw embedding
+2. MODIFY   load_word_embedding
+    - minor update
+
+@Update 170804
+==============
+Version 1.0
 """
 from __future__ import print_function
 
@@ -13,6 +23,8 @@ from collections import Counter
 import numpy as np
 import os
 import pickle
+
+import six
 
 
 def fn_timer(function):
@@ -55,10 +67,26 @@ class SingletonTest(object):
 # idf_calculator: gain idf from sentence list
 #############################################
 
+def split_abbreviation(word):
+    res = []
+    char = ''
+    for ch in word:
+        if char != '' and char[-1].islower() and ch.isupper():
+            res.append(char)
+            char = ''
+        char += ch
+    if char != '':
+        res.append(char)
+    return res
+
+
 def word2char(word_list):
     """
     Translate word_list to char_list
     """
+    if type(word_list) is six.text_type:
+        word_list = word_list.split()
+
     char_list = []
     word_string = ''.join(word_list)
     char = ''
@@ -67,9 +95,10 @@ def word2char(word_list):
             char += ch
         else:
             if char != '':
-                char_list.append(char)
+                char_list += split_abbreviation(char)
                 char = ''
             char_list.append(ch)
+    if char != '': char_list += split_abbreviation(char)
     return char_list
 
 
@@ -231,6 +260,7 @@ class FileManager(object):
         filename = os.path.splitext(file)[0]
         return filename
 
+
 def write_dict_to_csv(contents_dict, to_file):
     fieldnames = []
     contents = []
@@ -270,9 +300,11 @@ def check_dir_exist(dir_path):
 # Word Embedding Utils
 #############################################
 
-def load_word_embedding(vocab, emb_file, n_dim):
+
+def load_word_embedding(vocab, emb_file, n_dim,
+                        pad_word='__PAD__', unk_word='__UNK__'):
     """
-    UPDATE_1: fix the
+    UPDATE_1: fix the word embedding
     ===
     UPDATE_0: save the oov words in oov.p (pickle)
     Pros: to analysis why the this happen !!!
@@ -280,11 +312,11 @@ def load_word_embedding(vocab, emb_file, n_dim):
     :param vocab: dict, vocab['__UNK__'] = 0
     :param emb_file: str, file_path
     :param n_dim:
+    :param pad_word
+    :param unk_word
     :return: np.array(n_words, n_dim)
     """
     print('Load word embedding: %s' % emb_file)
-    pad_word = '__PAD__'
-    unk_word = '__UNK__'
     assert vocab[pad_word] == 0
     assert vocab[unk_word] == 1
 
@@ -292,13 +324,13 @@ def load_word_embedding(vocab, emb_file, n_dim):
     n_words = len(vocab)
 
     embeddings = np.random.uniform(-0.25, 0.25, (n_words, n_dim))
-    embeddings[0, ] = np.zeros(n_dim)
+    # embeddings[0, ] = np.zeros(n_dim)
 
-    with open(emb_file, 'r') as f:
+    with codecs.open(emb_file, 'r', encoding='utf8') as f:
         for idx, line in enumerate(f):
             if idx == 0 and len(line.split()) == 2:
                 continue
-            sp = line.rstrip().split(' ')
+            sp = line.rstrip().split()
             if len(sp) != n_dim + 1:
                 print(sp[0:len(sp) - n_dim])
 
@@ -320,6 +352,46 @@ def load_word_embedding(vocab, emb_file, n_dim):
 
     embeddings = np.array(embeddings, dtype=np.float32)
     return embeddings
+
+
+def load_embedding_from_text(emb_file, n_dim,
+                             pad_word='__PAD__', unk_word='__UNK__'):
+    """
+    :return: embed: numpy, vocab2id: dict
+    """
+    print('==> loading embed from txt')
+
+    vocab2id = {}
+    embed = []
+    word_id = 0
+
+    vocab2id[pad_word] = word_id
+    embed.append(np.zeros(shape=[n_dim, ], dtype=np.float32))
+
+    word_id += 1
+    vocab2id[unk_word] = word_id
+    embed.append(np.random.uniform(-0.25, 0.25, size=[n_dim, ]))
+
+    with codecs.open(emb_file, 'r', encoding='utf8') as f:
+        for idx, line in enumerate(f):
+            if idx == 0 and len(line.split()) == 2:
+                print('embedding info: ', line)
+                continue
+            sp = line.rstrip().split()
+
+            if len(sp) != n_dim + 1:
+                print(sp[0:len(sp) - n_dim])
+
+            w = ''.join(sp[0:len(sp) - n_dim])
+
+            emb = [float(x) for x in sp[len(sp) - n_dim:]]
+
+            word_id += 1
+            vocab2id[w] = word_id
+            embed.append(emb)
+
+    print('==> finished load input embed from txt')
+    return np.array(embed, dtype=np.float32), vocab2id
 
 
 #############################################

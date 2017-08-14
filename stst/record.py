@@ -2,7 +2,6 @@
 from __future__ import print_function
 
 import csv
-
 import numpy as np
 
 from stst import utils, config

@@ -15,15 +15,17 @@ MODEL_DIR = GENERATE_DIR + '/models'
 ''' record config '''
 RECORD_DIR = GENERATE_DIR + '/records'
 
-
 ''' tmp config '''
-TMP_DIR = '/generate' + '/tmp'
+TMP_DIR = GENERATE_DIR + '/tmp'
+
 
 RESOURCE = './stst/resources'
 ''' dict config '''
 DICT_DIR = RESOURCE
+PINYIN_FILE = DICT_DIR + '/F02-GB2312-to-PuTongHua-PinYin.txt'
+WIKI_BIN_FILE = '/disk2/junfeng.tjf/data/word2vec/wiki/wiki.zh+.100.bin'
 
-#
-# ''' nn feature config '''
-# NN_FEATURE_PATH = RESOURCE + '/iclr2016-test/data/features'
 
+''' score file '''
+DSSM_SCORE_FILE = './scores/dssm-08-08-scores.txt'
+LSTM_SCORE_FILE = './scores/lstm-08-08-scores.txt'

@@ -34,6 +34,8 @@ def minavgmaxpooling(word_list, w2i, embeddings, dim, convey, idf_weight):
         default_idf_weight = min(idf_weight.values())
         if convey == 'idf':
             w = idf_weight.get(word, default_idf_weight)
+        elif convey == 'count':
+            w = 1.0
         else:
             raise NotImplementedError
 
@@ -43,7 +45,7 @@ def minavgmaxpooling(word_list, w2i, embeddings, dim, convey, idf_weight):
 
     # concat sentence embedding
     vecs = []
-    for pooling_types in ['avg', 'min', 'max']:
+    for pooling_types in ['avg']: # ['avg', 'min', 'max']:
         vec = pooling(word_embs, dim, pooling_types)
         vecs.append(vec)
     vecs = np.reshape(vecs, [-1])
@@ -59,40 +61,30 @@ class MinAvgMaxEmbeddingFeature(Feature):
         self.binary = binary
 
         self.word_type = 'word'
-        self.stopwords = True
-        self.lower = True
-
         self.feature_name = self.feature_name + '-%s' % (emb_name)
 
     def extract_information(self, train_instances):
         seqs = []
         for train_instance in train_instances:
-            word_sa, word_sb = train_instance.get_word(
-                                                    type=self.word_type,
-                                                    stopwords=self.stopwords,
-                                                    lower=self.lower)
+            word_sa, word_sb = train_instance.get_pair(type=self.word_type)
             seqs.append(word_sa)
             seqs.append(word_sb)
 
         self.idf_weight = utils.idf_calculator(seqs)
         self.word2index = {word:index for index, word in enumerate(self.idf_weight.keys())}
-        self.embeddings = utils.load_word_embedding(self.word2index, self.emb_file, self.dim, self.binary)
+        self.embeddings = utils.load_word_embedding(self.word2index, self.emb_file, self.dim)
 
 
     def extract(self, train_instance):
 
-        word_sa, word_sb = train_instance.get_word(
-                                                    type=self.word_type,
-                                                    stopwords=self.stopwords,
-                                                    lower=self.lower)
-
+        word_sa, word_sb = train_instance.get_pair(type=self.word_type)
 
         pooling_vec_sa = minavgmaxpooling(word_sa, self.word2index, self.embeddings, self.dim,
                                           convey='idf', idf_weight=self.idf_weight)
         pooling_vec_sb = minavgmaxpooling(word_sb, self.word2index, self.embeddings, self.dim,
                                           convey='idf', idf_weight=self.idf_weight)
-        all_feats, all_names = vk.get_all_kernel(pooling_vec_sa, pooling_vec_sb)
-        features = all_feats
-
-        infos = [self.emb_name, self.word_type, self.stopwords, self.lower]
+        # all_feats, all_names = vk.get_all_kernel(pooling_vec_sa, pooling_vec_sb)
+        # features = all_feats
+        features = [1-utils.cosine_distance(pooling_vec_sa, pooling_vec_sb, norm=True)]
+        infos = [self.emb_name, self.word_type]
         return features, infos

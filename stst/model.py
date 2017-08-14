@@ -1,5 +1,6 @@
 # coding: utf8
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
 import random
@@ -20,10 +21,12 @@ class Model(object):
 
         self.feature_list = []
 
-        self.train_feature_file = config.MODEL_DIR + '/' + self.model_name + '.feature.train.txt'
-        self.dev_feature_file = config.MODEL_DIR + '/' + self.model_name + '.feature.dev.txt'
+        self.train_feature_file = '{}/{}.feature.train.txt'.format(
+            config.MODEL_DIR, self.model_name)
+        self.dev_feature_file = '{}/{}.feature.dev.txt'.format(
+            config.MODEL_DIR, self.model_name)
 
-        self.model_file = config.MODEL_DIR + '/' + self.model_name + '.pkl'
+        self.model_file = '{}/{}.pkl'.format(config.MODEL_DIR, self.model_name)
 
         # config.OUTPUT_DIR + '/' + self.model_name + '.output.txt'
         self.output_file = None

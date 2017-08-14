@@ -1,5 +1,1 @@
 pyprind
-python-jsonrpc
-gensim
-selenium
-nltk

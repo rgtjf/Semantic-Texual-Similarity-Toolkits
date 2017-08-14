@@ -1,90 +1,47 @@
 import stst
-from main_tools import *
+import config
+from stst.features.features_sequence import SequenceFeature, SentenceFeature
+from stst.features.features_ngram import nGramOverlapFeature, nCharGramOverlapFeature
+from stst.features.features_bow import BOWFeature, BOWCountFeature
+from stst.features.features_embedding import MinAvgMaxEmbeddingFeature
+from stst.evaluation import Evaluation, AdvancedEvaluation
 
 # Define Model
-gb = stst.Classifier(stst.GradientBoostingRegression())
-model = stst.Model('S1-gb', gb)
+gb = stst.Classifier(stst.AverageEnsemble())
+model = stst.Model('U', gb)
 
 # Add features to the Model
-model.add(stst.AsiyaMTFeature())
+model.add(nGramOverlapFeature(load=True))
+# model.add(nCharGramOverlapFeature(load=False))
 
-model.add(stst.SequenceFeature())
-model.add(stst.SentenceFeature())
-model.add(stst.ShortSentenceFeature())
+# model.add(SequenceFeature(load=False))
 
-model.add(stst.nGramOverlapFeature(type='lemma'))
-model.add(stst.nGramOverlapFeature(type='word'))
-model.add(stst.nCharGramOverlapFeature(stopwords=True))
-model.add(stst.nCharGramOverlapFeature(stopwords=False))
+model.add(BOWFeature(load=True))
+# model.add(BOWCountFeature())
 
-model.add(stst.nGramOverlapBeforeStopwordsFeature(type='lemma'))
-model.add(stst.nGramOverlapBeforeStopwordsFeature(type='word'))
+fastext_file = '../data/wiki.zh+.100.vec'
+cco_emb_file = '/disk2/junfeng.tjf/workSpace/insuranceQA-cnn-lstm/data/word2vec/kg_ry_single_column_text_kg_ry_word2vec_vector_comment.tsv'
 
-model.add(stst.WeightednGramMatchFeature(type='lemma'))
-model.add(stst.WeightednGramMatchFeature(type='word'))
-
-model.add(stst.BOWFeature(stopwords=False))
-# model.add(stst.BOWFeature(stopwords=True))
-# model.add(stst.BOWGlobalFeature(stopwords=False))
-# model.add(stst.BOWGlobalFeature(stopwords=True))
-
-model.add(stst.DependencyGramFeature(convey='count'))
-model.add(stst.DependencyGramFeature(convey='idf'))
-model.add(stst.DependencyRelationFeature(convey='count'))
-model.add(stst.DependencyRelationFeature(convey='idf'))
-
-model.add(stst.AlignmentFeature())
-model.add(stst.IdfAlignmentFeature())
-model.add(stst.PosAlignmentFeature())
-
-word2vec_file = '/home/junfeng/word2vec/GoogleNews-vectors-negative300.bin'
-paragram_file = '/home/junfeng/paragram-embedding/paragram_300_sl999.txt'
-glove100_file = '/home/junfeng/GloVe/glove.6B.100d.txt'
-glove300_file = '/home/junfeng/GloVe/glove.840B.300d.txt'
-
-model.add(stst.MinAvgMaxEmbeddingFeature('word2vec', 300, word2vec_file, binary=True))
-model.add(stst.MinAvgMaxEmbeddingFeature('paragram', 300, paragram_file))
-model.add(stst.MinAvgMaxEmbeddingFeature('glove100', 100, glove100_file))
-model.add(stst.MinAvgMaxEmbeddingFeature('glove300', 300, glove300_file))
-
-model.add(stst.POSLemmaMatchFeature(stopwords=True))
-model.add(stst.POSLemmaMatchFeature(stopwords=False))
-model.add(stst.POSNounEmbeddingFeature('word2vec', 300, word2vec_file, binary=True))
-model.add(stst.POSNounEditFeature())
-model.add(stst.POSTreeKernelFeature())
-
-model.add(stst.Doc2VecGlobalFeature())
-model.add(stst.NegativeFeature())
-
-
-hill_climbing(model)
+# model.add(MinAvgMaxEmbeddingFeature('fastext', 100, fastext_file))
+# model.add(MinAvgMaxEmbeddingFeature('cco_emb', 100, cco_emb_file))
 
 
 # train and test
-train_file = './data/stsbenchmark/sts-train.csv'
-dev_file  = './data/stsbenchmark/sts-dev.csv'
-test_file = './data/stsbenchmark/sts-test.csv'
-
-# init the server and input the address
-nlp = stst.StanfordNLP('http://localhost:9000')
+test_file = config.TRAIN_FILE
 
 # parse data
-train_instances = stst.load_parse_data(train_file, nlp)
-dev_instances = stst.load_parse_data(dev_file, nlp)
+test_instances = stst.load_parse_data(test_file, flag=False)
 
 # train and test
-model.train(train_instances, train_file)
-model.test(dev_instances, dev_file)
+model.test(test_instances, test_file)
 
 # evaluation
-dev_pearsonr = stst.eval_output_file(model.output_file)
-print('Dev:', dev_pearsonr)
+e = Evaluation(model.output_file)
+print('Test:', e.eval_P_at_N(), e.eval_MAP(), e.eval_MRR())
 
-# test on new data set
-test_instances= stst.load_parse_data(test_file, nlp)
-model.test(test_instances, test_file)
-test_pearsonr = stst.eval_output_file(model.output_file)
-print('Test:', test_pearsonr)
+e.plot()
 
-recod_file = './data/records.csv'
-stst.record(recod_file, dev_pearsonr, test_pearsonr, model)
+ae = AdvancedEvaluation(model.output_file).case_study()
+
+# recod_file = './data/records.csv'
+# stst.record(recod_file, dev_pearsonr, test_pearsonr, model)

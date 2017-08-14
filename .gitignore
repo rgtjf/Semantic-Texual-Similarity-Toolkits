@@ -95,3 +95,4 @@ ENV/
 .tox/
 stst.egg-info/
 ./iclr2016-test/data/
+./data/bak/

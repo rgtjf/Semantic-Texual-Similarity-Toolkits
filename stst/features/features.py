@@ -1,5 +1,6 @@
 # coding: utf8
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import json
 import os
@@ -163,7 +164,7 @@ class Feature(object):
 
     @staticmethod
     def _info_list_to_string(info_list):
-        info_string = json.dumps(info_list)
+        info_string = json.dumps(info_list, ensure_ascii=False)
         return info_string
 
 
