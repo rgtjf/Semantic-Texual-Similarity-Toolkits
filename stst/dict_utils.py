@@ -14,30 +14,30 @@ class DictLoader(object):
     def __init__(self):
         self.dict_manager = {}
 
-    def     load_dict(self, dict_name, path=config.DICT_DIR):
+    def load_dict(self, dict_name, dict_file_path):
         """
-        path: config.DICT_DIR
-              config.DICT_EX_DIR
+        manage the dict from list or dict
+        list index start from 1
         """
         if dict_name not in self.dict_manager:
 
             dict_object = {}
 
             cur_dir = os.path.dirname(__file__)
-            path = os.path.join(cur_dir, 'resources')
+            path = os.path.join(cur_dir, 'resources/{}'.format(dict_file_path))
 
             ''' load dict from file '''
-            file_name = path + '/dict_%s.txt' % dict_name
-            print('load dict from file %s \n' % file_name)
+            print('load dict from file {}'.format(path))
 
-            f_dict = utils.create_read_file(file_name)
+            f_dict = utils.create_read_file(path)
 
             for idx, line in enumerate(f_dict):
                 line = line.strip().split('\t')
                 if len(line) == 1:
                     dict_object[line[0]] = idx + 1
                 elif len(line) == 2:
-                    dict_object[line[0]] = eval(line[1])
+                    # NOT eval, for the value may be str
+                    dict_object[line[0]] = line[1]
                 else:
                     raise NotImplementedError
 
@@ -45,40 +45,9 @@ class DictLoader(object):
 
         return self.dict_manager[dict_name]
 
-    def load_doc2vec(self):
-        dict_name = 'doc2vec'
-        if dict_name not in self.dict_manager:
-            from gensim.models import Doc2Vec
-            model = Doc2Vec.load(config.EX_DICT_DIR + '/doc2vec.model')
-            self.dict_manager[dict_name] = model
-        return self.dict_manager[dict_name]
-
-    def load_idf_dict(self, dict_name='idf_dict'):
-
-        if dict_name not in self.dict_manager:
-
-            word_frequencies = {}
-
-            file_name = config.EX_DICT_DIR + '/word-frequencies.txt'
-            print('load dict from file %s \n' % file_name)
-
-            f_dict = utils.create_read_file(file_name)
-
-            for idx, line in enumerate(f_dict):
-                if idx == 0:
-                    totfreq = int(line)
-                else:
-                    w, freq = line.strip().split()
-                    freq = float(freq)
-                    if freq < 10:
-                        continue
-                    word_frequencies[w] = math.log(totfreq / freq)  / math.log(2)
-            self.dict_manager[dict_name] = word_frequencies
-
-        return self.dict_manager[dict_name]
-
 
 class DictCreater(object):
+
     def __init__(self):
         pass
 
@@ -88,9 +57,8 @@ class DictCreater(object):
         """
 
         def __create_dict(*args, **kwargs):
-            print("==" * 40)
-            print("Create dict for %s ...  " % (func.__name__.replace("create_", "")))
-            print("==" * 40)
+            print("====> create dict for function [{}]".format(func.__name__))
+
             ret = func(*args, **kwargs)
 
             ''' remove item whose frequency is less than threshold '''
@@ -101,8 +69,7 @@ class DictCreater(object):
                         ret.pop(key)
 
             ''' write dict to file '''
-
-            file_name = 'dict_' + func.__name__.replace("create_", "") + '.txt'
+            file_name = 'dict_{}.txt'.format(func.__name__)
             f_dict = utils.create_write_file(config.DICT_DIR + '/' + file_name)
 
             if type(ret) == list:
@@ -122,13 +89,13 @@ class DictCreater(object):
 
             f_dict.close()
 
-            print("Write file: %s, %d instances" % (file_name, len(ret)))
+            print("====> write file {}, {:d}    instances".format(file_name, len(ret)))
             return ret
 
         return __create_dict
 
     @_create_dict
-    def create_stopwords(self):
+    def stopwords(self):
         # stopwords 2: zhaojiang's
         # fp = open(config.DICT_DIR + '/english.stopwords.txt', 'r')
         # english_stopwords = [line.strip('\r\n ') for line in fp.readlines()]
@@ -140,35 +107,5 @@ class DictCreater(object):
         stopwords = stanford_stopwords
         return stopwords
 
-
-    @_create_dict
-    def create_global_idf(self, file_list):
-        print('\n'.join(file_list))
-        sentences, _ = stst.load_sentences(file_list)
-        print(sentences[:5])
-        global_idf = utils.idf_calculator(sentences)
-        return global_idf
-
-
 if __name__ == '__main__':
-
-
-    # import data_utils
-    #
-    # ''' Load SentPair Object'''
-    # train_file = config.TRAIN_FILE
-    # train_gs = config.TRAIN_GS_FILE
-    # train_parse_data = data_utils.load_parse_data(train_file, train_gs, flag=False)
-    #
-    # sentences = []
-    # for train_instance in train_parse_data:
-    #     sa, sb = train_instance.get_word(type='word')
-    #     sentences.append(sa)
-    #     sentences.append(sb)
-    #
-    # DictCreater().create_topic(sentences)
-    DictCreater().create_global_idf()  # lemma, lower=True, stopwords=False
-    # DictCreater().create_corpus_idf()
-    # DictLoader().load_dict('stopwords')
-    # DictCreater().create_stopwords()
-
+    pass

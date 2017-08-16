@@ -1,41 +1,78 @@
 import stst
+import config
+from stst.features.features_sequence import SequenceFeature, SentenceFeature
+from stst.features.features_ngram import nGramOverlapFeature, nCharGramOverlapFeature
+from stst.features.features_bow import BOWFeature, BOWCountFeature
+from stst.features.features_dssm import DSSMFeature, LSTMFeature
+from stst.features.features_pinyin import PinYinFeature
+from stst.features.features_embedding import MinAvgMaxEmbeddingFeature
+from stst.features.features_w2v import Word2VecFeature
+from stst.evaluation import Evaluation, AdvancedEvaluation
+
+import yunqi_eval
 
 # Define Model
-gb = stst.Classifier(stst.GradientBoostingRegression())
-model = stst.Model('S1-gb', gb)
+avg = stst.Classifier(stst.AverageEnsemble())
+model = stst.Model('U', avg)
+
+model_en = stst.Model('EN', avg)
 
 # Add features to the Model
-model.add(stst.WeightednGramMatchFeature(type='lemma'))
-model.add(stst.BOWFeature(stopwords=False))
-model.add(stst.AlignmentFeature())
-model.add(stst.IdfAlignmentFeature())
-model.add(stst.NegativeFeature())
+
+''' Word '''
+model.add(nGramOverlapFeature(type='word+', load=False))
+model.add(BOWFeature(type='word+', load=False))
+
+''' NER '''
+model.add(BOWCountFeature(type='ner', load=True))
+
+''' Char '''
+model.add(PinYinFeature(load=True))
+model.add(nCharGramOverlapFeature(load=True))
+model.add(BOWFeature(type='char', load=True))
+
+''' DL '''
+model.add(DSSMFeature(load=True))
+model.add(LSTMFeature(load=True))
+# model.add(DSSMFeature(load=True))
+# model.add(LSTMFeature(load=True))
+
+''' Word2Vec '''
+model.add(Word2VecFeature(load=True))
+
+# model.add(SequenceFeature(load=False))
+# model.add(BOWCountFeature())
+
+fastext_file = '../data/wiki.zh+.100.vec'
+cco_emb_file = '/disk2/junfeng.tjf/workSpace/insuranceQA-cnn-lstm/data/word2vec/kg_ry_single_column_text_kg_ry_word2vec_vector_comment.tsv'
+
+# model.add(MinAvgMaxEmbeddingFeature('fastext', 100, fastext_file))
+# model.add(MinAvgMaxEmbeddingFeature('cco_emb', 100, cco_emb_file))
+
 
 # train and test
-train_file = './data/stsbenchmark/sts-train.csv'
-dev_file  = './data/stsbenchmark/sts-dev.csv'
-test_file = './data/stsbenchmark/sts-test.csv'
+corpus_file = config.CORPUS_FILE
+test_file = config.TRAIN_FILE
 
-# init the server and input the address
-nlp = stst.StanfordNLP('http://localhost:9000')
+gold_file = config.GOLD_FILE
+
 
 # parse data
-train_instances = stst.load_parse_data(train_file, nlp)
-dev_instances = stst.load_parse_data(dev_file, nlp)
+test_instances = stst.load_parse_data(test_file, corpus_file, flag=False)
 
 # train and test
-model.train(train_instances, train_file)
-model.test(dev_instances, dev_file)
+model.test(test_instances, test_file)
+
+# model_en.test(test_instances, test_file)
 
 # evaluation
-dev_pearsonr = stst.eval_output_file(model.output_file)
-print('Dev:', dev_pearsonr)
+e = yunqi_eval.Evaluation(model.output_file, gold_file)
 
-# test on new data set
-test_instances= stst.load_parse_data(test_file, nlp)
-model.test(test_instances, test_file)
-test_pearsonr = stst.eval_output_file(model.output_file)
-print('Test:', test_pearsonr)
+e.case_study_chitchat()
 
-recod_file = './data/records.csv'
-stst.record(recod_file, dev_pearsonr, test_pearsonr, model)
+e.case_study_yunqi()
+
+for th in range(0, 101, 10):
+    e.eval_P(th / 100.)
+
+e.eval_yunqi()
