@@ -1,28 +1,43 @@
 # coding: utf8
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import json
 
 ##############################################################################################################################
-def nerWordAnnotator(parseResult):
+def ner_word_annotator(parse_sent):
+    """
+    Generate NER Tag Sequence:
+        - FORMAT: [[char_begin, char_end], word_index, word, ner] only ner != 'O'
+    """
     res = []
     wordIndex = 1
-    for i in range(len(parseResult['sentences'][0]['tokens'])):
-        tag = [[
-            parseResult['sentences'][0]['tokens'][i]['characterOffsetBegin'],
-            parseResult['sentences'][0]['tokens'][i]['characterOffsetEnd']
-        ],
-            wordIndex,
-            parseResult['sentences'][0]['tokens'][i]['word'], parseResult['sentences'][0]['tokens'][i]['ner']]
+    for i in range(len(parse_sent['sentences'][0]['tokens'])):
+        tag = [
+                [
+                    parse_sent['sentences'][0]['tokens'][i]['characterOffsetBegin'],
+                    parse_sent['sentences'][0]['tokens'][i]['characterOffsetEnd']
+                ],
+                wordIndex,
+                parse_sent['sentences'][0]['tokens'][i]['word'],
+                parse_sent['sentences'][0]['tokens'][i]['ner'],
+            ]
         wordIndex += 1
         if tag[3] != 'O':
             res.append(tag)
     return res
-
-
 ##############################################################################################################################
 
 
 ##############################################################################################################################
-def ner(parseResult):
-    nerWordAnnotations = nerWordAnnotator(parseResult)
+def ner(parse_sent):
+    """
+    Generate Merged NER Sequence
+        - FORMAT: [[ne], [char], [word]]
+    Merge the same and adjacent NER tag into one list
+    """
+
+    nerWordAnnotations = ner_word_annotator(parse_sent)
 
     namedEntities = []
     currentNE = []
@@ -31,60 +46,56 @@ def ner(parseResult):
 
     for i in range(len(nerWordAnnotations)):
 
+        # If the ner i == i-1, then do nothing
+        # If i == 0, then do nothing
         if i == 0:
-            currentNE.append(nerWordAnnotations[i][2])
-            currentCharacterOffsets.append(nerWordAnnotations[i][0])
-            currentWordOffsets.append(nerWordAnnotations[i][1])
-            if len(nerWordAnnotations) == 1:
-                namedEntities.append(
-                    [currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i - 1][3]])
-                break
-            continue
-
-        if nerWordAnnotations[i][3] == nerWordAnnotations[i - 1][3] and nerWordAnnotations[i][1] == \
-                        nerWordAnnotations[i - 1][1] + 1:
-            currentNE.append(nerWordAnnotations[i][2])
-            currentCharacterOffsets.append(nerWordAnnotations[i][0])
-            currentWordOffsets.append(nerWordAnnotations[i][1])
-            if i == len(nerWordAnnotations) - 1:
-                namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i][3]])
+            pass
+        elif i != 0 and nerWordAnnotations[i][3] == nerWordAnnotations[i - 1][3] \
+                and nerWordAnnotations[i][1] == nerWordAnnotations[i - 1][1] + 1:
+            pass
         else:
-            namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i - 1][3]])
-            currentNE = [nerWordAnnotations[i][2]]
+            namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE,
+                                  nerWordAnnotations[i - 1][3]])
+            currentNE = []
             currentCharacterOffsets = []
-            currentCharacterOffsets.append(nerWordAnnotations[i][0])
             currentWordOffsets = []
-            currentWordOffsets.append(nerWordAnnotations[i][1])
-            if i == len(nerWordAnnotations) - 1:
-                namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i][3]])
+
+        currentNE.append(nerWordAnnotations[i][2])
+        currentCharacterOffsets.append(nerWordAnnotations[i][0])
+        currentWordOffsets.append(nerWordAnnotations[i][1])
+
+    if len(currentNE) != 0:
+        ner_last_index = len(nerWordAnnotations) - 1
+        namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE,
+                              nerWordAnnotations[ner_last_index][3]])
 
     return namedEntities
-
-
 ##############################################################################################################################
 
 
+
+
 ##############################################################################################################################
-def posTag(parseResult):
+def posTag(parse_sent):
+    """
+    Generate POS Tag Sequence:
+        - FORMAT: [[char_begin, char_end], word_index, word, pos]
+    """
     res = []
-
     wordIndex = 1
-    for i in range(len(parseResult['sentences'][0]['tokens'])):
+    for i in range(len(parse_sent['sentences'][0]['tokens'])):
         tag = [
                 [
-                    parseResult['sentences'][0]['tokens'][i]['characterOffsetBegin'],
-                    parseResult['sentences'][0]['tokens'][i]['characterOffsetEnd']
+                    parse_sent['sentences'][0]['tokens'][i]['characterOffsetBegin'],
+                    parse_sent['sentences'][0]['tokens'][i]['characterOffsetEnd']
                 ],
                 wordIndex,
-                parseResult['sentences'][0]['tokens'][i]['word'],
-                parseResult['sentences'][0]['tokens'][i]['pos']
+                parse_sent['sentences'][0]['tokens'][i]['word'],
+                parse_sent['sentences'][0]['tokens'][i]['pos']
         ]
         wordIndex += 1
         res.append(tag)
-
     return res
-
-
 ##############################################################################################################################
 
 
@@ -92,8 +103,11 @@ def posTag(parseResult):
 
 ##############################################################################################################################
 def lemmatize(parseResult):
+    """
+    Generate Lemma Sequence:
+        - FORMAT: [[char_begin, char_end], word_index, word, lemma]
+    """
     res = []
-
     wordIndex = 1
     for i in range(len(parseResult['sentences'][0]['tokens'])):
         tag = [
@@ -109,17 +123,17 @@ def lemmatize(parseResult):
         res.append(tag)
 
     return res
-
-
 ##############################################################################################################################
-
 
 
 
 
 ##############################################################################################################################
 def dependencyParseAndPutOffsets(parseResult):
-    # returns dependency parse of the sentence whhere each item is of the form (rel, left{charStartOffset, charEndOffset, wordNumber}, right{charStartOffset, charEndOffset, wordNumber})
+    """
+    returns dependency parse of the sentence where each item is of the form:
+    (rel, left{charStartOffset charEndOffset wordIndex}, right{charStartOffset, charEndOffset, wordIndex})
+    """
 
     dParse = parseResult['sentences'][0]['basic-dependencies']
     tokens = parseResult['sentences'][0]['tokens']
@@ -148,14 +162,16 @@ def dependencyParseAndPutOffsets(parseResult):
 
         leftIndex -= 1
         rightIndex -= 1
-        left += '{' + str(tokens[leftIndex]['characterOffsetBegin']) + ' ' + str(
-            tokens[leftIndex]['characterOffsetEnd']) + ' ' + str(leftIndex + 1) + '}'
-        right += '{' + str(tokens[rightIndex]['characterOffsetBegin']) + ' ' + str(
-            tokens[rightIndex]['characterOffsetEnd']) + ' ' + str(rightIndex + 1) + '}'
+        left += '{{{0} {1} {2}}}'.format(tokens[leftIndex]['characterOffsetBegin'],
+                                       tokens[leftIndex]['characterOffsetEnd'],
+                                       leftIndex + 1)
+
+        right += '{{{0} {1} {2}}}'.format(tokens[rightIndex]['characterOffsetBegin'],
+                                        tokens[rightIndex]['characterOffsetEnd'],
+                                        rightIndex + 1)
         result.append([rel, left, right])
 
     return result
-
 
 ##############################################################################################################################
 
@@ -206,7 +222,6 @@ def findParents(dependencyParse, wordIndex, word):
                 break
 
     return parentsWithRelation
-
 
 ##############################################################################################################################
 
@@ -260,5 +275,23 @@ def findChildren(dependencyParse, wordIndex, word):
 
     return childrenWithRelation
 
-
 ##############################################################################################################################
+
+
+
+if __name__ == '__main__':
+
+    parse_sent = u"""[{"sentences": [{"tokens": [{"index": 1, "word": "Waba", "lemma": "waba", "after": " ", "pos": "NN", "characterOffsetEnd": 4, "characterOffsetBegin": 0, "originalText": "Waba", "ner": "PERSON", "before": ""}, {"index": 2, "word": "emerges", "lemma": "emerge", "after": " ", "pos": "VBZ", "characterOffsetEnd": 12, "characterOffsetBegin": 5, "originalText": "emerges", "ner": "O", "before": " "}, {"index": 3, "word": "new", "lemma": "new", "after": " ", "pos": "JJ", "characterOffsetEnd": 16, "characterOffsetBegin": 13, "originalText": "new", "ner": "O", "before": " "}, {"index": 4, "word": "NLC", "lemma": "nlc", "after": " ", "pos": "NN", "characterOffsetEnd": 20, "characterOffsetBegin": 17, "originalText": "NLC", "ner": "ORGANIZATION", "before": " "}, {"index": 5, "word": "president", "lemma": "president", "after": "", "pos": "NN", "characterOffsetEnd": 30, "characterOffsetBegin": 21, "originalText": "president", "ner": "O", "before": " "}], "index": 0, "basic-dependencies": [{"dep": "ROOT", "dependent": 2, "governorGloss": "ROOT", "governor": 0, "dependentGloss": "emerges"}, {"dep": "nsubj", "dependent": 1, "governorGloss": "emerges", "governor": 2, "dependentGloss": "Waba"}, {"dep": "amod", "dependent": 3, "governorGloss": "president", "governor": 5, "dependentGloss": "new"}, {"dep": "compound", "dependent": 4, "governorGloss": "president", "governor": 5, "dependentGloss": "NLC"}, {"dep": "dobj", "dependent": 5, "governorGloss": "emerges", "governor": 2, "dependentGloss": "president"}], "parse": "(ROOT\n  (S\n    (NP (NN Waba))\n    (VP (VBZ emerges)\n      (NP (JJ new) (NN NLC) (NN president)))))", "collapsed-dependencies": [{"dep": "ROOT", "dependent": 2, "governorGloss": "ROOT", "governor": 0, "dependentGloss": "emerges"}, {"dep": "nsubj", "dependent": 1, "governorGloss": "emerges", "governor": 2, "dependentGloss": "Waba"}, {"dep": "amod", "dependent": 3, "governorGloss": "president", "governor": 5, "dependentGloss": "new"}, {"dep": "compound", "dependent": 4, "governorGloss": "president", "governor": 5, "dependentGloss": "NLC"}, {"dep": "dobj", "dependent": 5, "governorGloss": "emerges", "governor": 2, "dependentGloss": "president"}], "collapsed-ccprocessed-dependencies": [{"dep": "ROOT", "dependent": 2, "governorGloss": "ROOT", "governor": 0, "dependentGloss": "emerges"}, {"dep": "nsubj", "dependent": 1, "governorGloss": "emerges", "governor": 2, "dependentGloss": "Waba"}, {"dep": "amod", "dependent": 3, "governorGloss": "president", "governor": 5, "dependentGloss": "new"}, {"dep": "compound", "dependent": 4, "governorGloss": "president", "governor": 5, "dependentGloss": "NLC"}, {"dep": "dobj", "dependent": 5, "governorGloss": "emerges", "governor": 2, "dependentGloss": "president"}]}]}, {"sentences": [{"tokens": [{"index": 1, "word": "Waiting", "lemma": "wait", "after": " ", "pos": "VBG", "characterOffsetEnd": 7, "characterOffsetBegin": 0, "originalText": "Waiting", "ner": "O", "before": ""}, {"index": 2, "word": "for", "lemma": "for", "after": " ", "pos": "IN", "characterOffsetEnd": 11, "characterOffsetBegin": 8, "originalText": "for", "ner": "O", "before": " "}, {"index": 3, "word": "the", "lemma": "the", "after": " ", "pos": "DT", "characterOffsetEnd": 15, "characterOffsetBegin": 12, "originalText": "the", "ner": "O", "before": " "}, {"index": 4, "word": "next", "lemma": "next", "after": " ", "pos": "JJ", "characterOffsetEnd": 20, "characterOffsetBegin": 16, "originalText": "next", "ner": "O", "before": " "}, {"index": 5, "word": "president", "lemma": "president", "after": "", "pos": "NN", "characterOffsetEnd": 30, "characterOffsetBegin": 21, "originalText": "president", "ner": "O", "before": " "}], "index": 0, "basic-dependencies": [{"dep": "ROOT", "dependent": 1, "governorGloss": "ROOT", "governor": 0, "dependentGloss": "Waiting"}, {"dep": "case", "dependent": 2, "governorGloss": "president", "governor": 5, "dependentGloss": "for"}, {"dep": "det", "dependent": 3, "governorGloss": "president", "governor": 5, "dependentGloss": "the"}, {"dep": "amod", "dependent": 4, "governorGloss": "president", "governor": 5, "dependentGloss": "next"}, {"dep": "nmod", "dependent": 5, "governorGloss": "Waiting", "governor": 1, "dependentGloss": "president"}], "parse": "(ROOT\n  (S\n    (VP (VBG Waiting)\n      (PP (IN for)\n        (NP (DT the) (JJ next) (NN president))))))", "collapsed-dependencies": [{"dep": "ROOT", "dependent": 1, "governorGloss": "ROOT", "governor": 0, "dependentGloss": "Waiting"}, {"dep": "case", "dependent": 2, "governorGloss": "president", "governor": 5, "dependentGloss": "for"}, {"dep": "det", "dependent": 3, "governorGloss": "president", "governor": 5, "dependentGloss": "the"}, {"dep": "amod", "dependent": 4, "governorGloss": "president", "governor": 5, "dependentGloss": "next"}, {"dep": "nmod:for", "dependent": 5, "governorGloss": "Waiting", "governor": 1, "dependentGloss": "president"}], "collapsed-ccprocessed-dependencies": [{"dep": "ROOT", "dependent": 1, "governorGloss": "ROOT", "governor": 0, "dependentGloss": "Waiting"}, {"dep": "case", "dependent": 2, "governorGloss": "president", "governor": 5, "dependentGloss": "for"}, {"dep": "det", "dependent": 3, "governorGloss": "president", "governor": 5, "dependentGloss": "the"}, {"dep": "amod", "dependent": 4, "governorGloss": "president", "governor": 5, "dependentGloss": "next"}, {"dep": "nmod:for", "dependent": 5, "governorGloss": "Waiting", "governor": 1, "dependentGloss": "president"}]}]}, 1.0]"""
+
+    parse_json = json.loads(parse_sent, strict=False)
+    sa, sb, score = parse_json
+
+    print(sa)
+    print(ner_word_annotator(sa))
+    print(ner(sa))
+    print(posTag(sa))
+    print(dependencyParseAndPutOffsets(sa))
+    print(findParents(dependencyParseAndPutOffsets(sa), 1, 'Weba'))
+    print(findChildren(dependencyParseAndPutOffsets(sa), 2, 'emerges'))
+
+    # print(ner(json.loads(parse_sent)))
