@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import math
 import os
+import ast
 
 import stst
 import stst.config
@@ -14,7 +15,7 @@ class DictLoader(object):
     def __init__(self):
         self.dict_manager = {}
 
-    def load_dict(self, dict_name, dict_file_path):
+    def load_dict(self, dict_name, dict_file_path, sep='\t'):
         """
         manage the dict from list or dict
         list index start from 1
@@ -32,12 +33,13 @@ class DictLoader(object):
             f_dict = utils.create_read_file(path)
 
             for idx, line in enumerate(f_dict):
-                line = line.strip().split('\t')
+                line = line.strip().split(sep)
                 if len(line) == 1:
                     dict_object[line[0]] = idx + 1
                 elif len(line) == 2:
                     # NOT eval, for the value may be str
-                    dict_object[line[0]] = line[1]
+                    # dict_object[line[0]] = line[1]
+                    dict_object[line[0]] = ast.literal_eval(line[1])
                 else:
                     raise NotImplementedError
 

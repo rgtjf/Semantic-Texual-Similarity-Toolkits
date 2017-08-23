@@ -23,9 +23,11 @@ RESOURCE = './stst/resources'
 ''' dict config '''
 DICT_DIR = RESOURCE
 PINYIN_FILE = DICT_DIR + '/F02-GB2312-to-PuTongHua-PinYin.txt'
+NER_FILE = DICT_DIR + '/dict_ner.txt'
 WIKI_BIN_FILE = '/disk2/junfeng.tjf/data/word2vec/wiki/wiki.zh+.100.bin'
 
 
 ''' score file '''
+SCORE_DIR = './scores/'
 DSSM_SCORE_FILE = './scores/dssm-08-08-scores.txt'
 LSTM_SCORE_FILE = './scores/lstm-08-08-scores.txt'

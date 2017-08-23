@@ -167,3 +167,43 @@ class AverageEnsemble(Strategy):
             for y in y_pred:
                 print(y, file=f)
         return y_pred
+
+
+class PipeLine(Strategy):
+
+    def __init__(self, threshold_lower, threshold_upper):
+        """
+        This Method Must Have Two Models as Input.
+        """
+        self.trainer = "PipLine"
+        self.threshold_lower = threshold_lower
+        self.threshold_upper = threshold_upper
+        print("Using %s Classifier" % (self.trainer))
+
+    def train_model(self, train_file_path, model_path):
+        pass
+
+    def test_model(self, test_file_path, model_path, result_file_path):
+        print("==> Load the data ...")
+        X_test, Y_test = self.load_file(test_file_path)
+        print(test_file_path, shape(X_test))
+        X_test = X_test.toarray()
+
+        for x in X_test[:10]:
+            print(x)
+
+        print("==> Test the model ...")
+        y_pred = []
+        for x in X_test:
+            x_= 0.0
+            if x[0] > self.threshold_upper:
+                x_ = None
+
+            x = sum(x) / len(x)
+            y_pred.append(x)
+
+        print("==> Save the result ...")
+        with utils.create_write_file(result_file_path) as f:
+            for y in y_pred:
+                print(y, file=f)
+        return y_pred

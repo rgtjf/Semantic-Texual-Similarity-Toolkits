@@ -1,6 +1,7 @@
 # coding: utf8
 from __future__ import print_function
 
+import os
 from collections import Counter
 
 from stst.features.features import Feature
@@ -22,15 +23,23 @@ class DSSMFeature(Feature):
                 infos.append(['dssm_score'])
         return features, infos
 
+
 class LSTMFeature(Feature):
+
+    def __init__(self, name, file_name, **kwargs):
+        super(LSTMFeature, self).__init__(**kwargs)
+        self.name = name
+        self.file_name = file_name
+        self.feature_name = self.feature_name + '-%s' % (name)
 
     def extract_instances(self, train_instances):
         """
         extract features to features
         """
         features, infos = [], []
-        score_file = config.LSTM_SCORE_FILE
-        with utils.create_read_file(score_file) as f:
+        score_file_path = os.path.join(config.SCORE_DIR, self.file_name)
+        # score_file = config.LSTM_SCORE_FILE
+        with utils.create_read_file(score_file_path) as f:
             for line in f:
                 score = eval(line.split()[0])
                 features.append([score])
