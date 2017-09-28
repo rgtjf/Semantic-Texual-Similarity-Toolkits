@@ -1,4 +1,4 @@
-# Semantic Textual Similarity Toolkits
+﻿# Semantic Textual Similarity Toolkits
 
 A light version of STST
 
