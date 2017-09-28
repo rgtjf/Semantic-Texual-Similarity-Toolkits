@@ -48,11 +48,13 @@ class DefineExample(stst.Example):
 
 class STSEvaluation(stst.Evaluation):
 
-    def __init__(self, score_file, gold_file):
-        predicts = open(score_file).readlines()
-        golds = open(gold_file).readlines()
-        self.predicts = [float(x.strip().split()[0])for x in predicts]
-        self.golds = [float(x.strip().split()[0]) for x in golds]
+    def __init__(self, predicts, golds):
+        self.predicts = predicts
+        self.golds = golds
+        # predicts = open(score_file).readlines()
+        # golds = open(gold_file).readlines()
+        # self.predicts = [float(x.strip().split()[0])for x in predicts]
+        # self.golds = [float(x.strip().split()[0]) for x in golds]
     
     def evaluation(self):
         result = {}
@@ -69,6 +71,23 @@ class STSEvaluation(stst.Evaluation):
         """
         pearsonr = meas.pearsonr(predict, gold)[0]
         return pearsonr
+    
+    @staticmethod
+    def init_from_modelfile(output_file):
+        """
+        output_file: 
+            FORMAT 
+                25.00   #   1.8 A woman is cutting onions.  A woman is cutting tofu.
+        """
+        predicts, golds = [], []
+        with open(output_file) as f:
+            for line in f:
+                items = line.strip().split('\t#\t')
+                predict = float(items[0])
+                gold = float(items[1].split()[0])
+                predicts.append(predict)
+                golds.append(gold)
+        return STSEvaluation(predicts, golds)
 
 
 class DefineFeature(stst.Feature):
@@ -91,6 +110,16 @@ model.add(DefineFeature(load=False))
 
 model.test(train_instances, train_file)
 
-evaluation = STSEvaluation(model.output_file, train_file)
+evaluation = STSEvaluation.init_from_modelfile(model.output_file)
 results = evaluation.evaluation()
 print(results)
+
+
+logger = stst.utils.get_logger('stst-basic.log')
+
+logger.info('===<start>===')
+logger.info('model_name = %s' % model.model_name)
+logger.info('classfier_name = %s' % model.classifier.strategy.trainer)
+logger.info('feature_list = %s' % [feature.feature_name for feature in model.feature_list])
+logger.info('results = %s' % results)
+logger.info('===<end>===\n\n')
