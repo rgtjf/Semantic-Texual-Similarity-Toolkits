@@ -1,6 +1,6 @@
 # Semantic Textual Similarity Toolkits
 
-[![Gitter]()](https://gitter.im/ecnunlp/Lobby?)
+[![Gitter](https://badges.gitter.im/owner/repo.png)](https://gitter.im/ecnunlp/Lobby?)
 
 ## Installation
 1. download the repo
