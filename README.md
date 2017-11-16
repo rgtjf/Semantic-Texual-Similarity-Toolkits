@@ -1,5 +1,7 @@
 # Semantic Textual Similarity Toolkits
 
+[![Gitter](https://badges.gitter.im/alibaba/dubbo.svg)](https://gitter.im/ecnunlp/Lobby?)
+
 ## Installation
 1. download the repo
 2. run the corenlp server
