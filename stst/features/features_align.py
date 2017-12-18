@@ -5,7 +5,7 @@ import pyprind
 
 from stst.features.features import Feature
 from stst import utils
-from stst.lib.word_aligner import aligner
+from stst.libs.word_aligner import aligner
 
 
 class AlignmentFeature(Feature):
@@ -110,7 +110,7 @@ class PosAlignmentFeature(Feature):
 
         self.extract_information(train_instances)
         idf_weight = self.idf_weight
-        default_idf_weight = min(idf_weight.values())
+        min_idf_weight = min(idf_weight.values())
 
         features = []
         infos = []
@@ -149,13 +149,13 @@ class PosAlignmentFeature(Feature):
             sent2_ali = {'n': 0., 'v': 0., 'a': 0., 'r': 0., '#': 0.}
             for idx, word in enumerate(word_sa):
                 pos = pos_sa[idx][1]
-                weight = idf_weight.get(word, default_idf_weight)
+                weight = idf_weight.get(word, min_idf_weight)
                 sent1_ali[pos] = sent1_aligned[idx] * weight
                 sent1_sum[pos] += weight
 
             for idx, word in enumerate(word_sb):
                 pos = pos_sb[idx][1]
-                weight = idf_weight.get(word, default_idf_weight)
+                weight = idf_weight.get(word, min_idf_weight)
                 sent2_ali[pos] += sent2_aligned[idx] * weight
                 sent2_sum[pos] += weight
 

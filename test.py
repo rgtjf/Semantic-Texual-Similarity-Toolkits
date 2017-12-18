@@ -20,8 +20,8 @@ model.add(stst.nCharGramOverlapFeature(stopwords=False))
 model.add(stst.nGramOverlapBeforeStopwordsFeature(type='lemma'))
 model.add(stst.nGramOverlapBeforeStopwordsFeature(type='word'))
 
-model.add(stst.WeightednGramMatchFeature(type='lemma'))
-model.add(stst.WeightednGramMatchFeature(type='word'))
+model.add(stst.WeightednGramOverlapFeature(type='lemma'))
+model.add(stst.WeightednGramOverlapFeature(type='word'))
 
 model.add(stst.BOWFeature(stopwords=False))
 # model.add(stst.BOWFeature(stopwords=True))

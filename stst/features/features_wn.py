@@ -1,5 +1,5 @@
 from stst.features.features import Feature
-from stst.lib.sentence_similarity.short_sentence_similarity import *
+from stst.libs.sentence_similarity.short_sentence_similarity import *
 
 class ShortSentenceFeature(Feature):
     def extract(self, train_instance):

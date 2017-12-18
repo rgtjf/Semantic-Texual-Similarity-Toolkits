@@ -1,10 +1,11 @@
 import nltk
 import numpy as np
 import pyjsonrpc
-
 from features import Feature
-from stst.lib.kernel import vector_kernel as vk
-from stst import dict_utils
+
+from stst.data import dict_utils
+from stst.libs.kernel import vector_kernel as vk
+
 
 class Embedding(object):
     def __init__(self):

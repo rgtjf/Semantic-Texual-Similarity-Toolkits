@@ -1,5 +1,5 @@
 from stst.features.features import Feature
-from stst.lib.kernel import tree, tree_kernels
+from stst.libs.kernel import tree, tree_kernels
 
 
 def get_all_tree_kernels(tree1, tree2):

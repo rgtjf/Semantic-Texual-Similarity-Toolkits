@@ -2,7 +2,7 @@ import nltk
 import numpy as np
 
 from stst.features.features import Feature
-from stst.lib.kernel import vector_kernel as vk
+from stst.libs.kernel import vector_kernel as vk
 from stst import utils
 
 
@@ -67,10 +67,9 @@ class MinAvgMaxEmbeddingFeature(Feature):
     def extract_information(self, train_instances):
         seqs = []
         for train_instance in train_instances:
-            word_sa, word_sb = train_instance.get_word(
-                                                    type=self.word_type,
-                                                    stopwords=self.stopwords,
-                                                    lower=self.lower)
+            word_sa, word_sb = train_instance.get_word(type=self.word_type,
+                                                        stopwords=self.stopwords,
+                                                        lower=self.lower)
             seqs.append(word_sa)
             seqs.append(word_sb)
 
@@ -81,8 +80,7 @@ class MinAvgMaxEmbeddingFeature(Feature):
 
     def extract(self, train_instance):
 
-        word_sa, word_sb = train_instance.get_word(
-                                                    type=self.word_type,
+        word_sa, word_sb = train_instance.get_word(type=self.word_type,
                                                     stopwords=self.stopwords,
                                                     lower=self.lower)
 

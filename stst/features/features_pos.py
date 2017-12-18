@@ -3,7 +3,7 @@ from __future__ import print_function
 
 from stst.features.features import Feature
 from stst import utils
-from stst.lib.kernel import vector_kernel as vk
+from stst.libs.kernel import vector_kernel as vk
 
 
 class POSMatchFeature(Feature):

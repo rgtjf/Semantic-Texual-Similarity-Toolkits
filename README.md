@@ -2,41 +2,40 @@
 
 [![Gitter](https://badges.gitter.im/owner/repo.png)](https://gitter.im/ecnunlp/Lobby?)
 
+This is the code by [ECNU team](http://aclweb.org/anthology/S/S17/S17-2028.pdf) submitted to SemEval STS Task.
+
 ## Installation
-1. download the repo
-2. run the corenlp server
-   standford CoreNLP 3.6.0 [download](http://nlp.stanford.edu/software/stanford-corenlp-full-2015-12-09.zip)
-    - Usage
-    ```
-    $ cd stanford-corenlp-full-2015-12-09/
-    $ java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer')
-    ```
-3. python
-    - requirements.txt
-    - Usage
-    ```
-    $ pip install -r requirements.txt
-    ```
-    - Download the NLTK stopword corpus:
-    ```
-    $ python -m nltk.downloader stopwords
-    ```
-4. Run
 
-    ```
-    $python example.py
-    ```
+```bash
+# download the repo
+git clone https://github.com/rgtjf/Semantic-Texual-Similarity-Toolkits.git
+# download the dataset and stanford CoreNLP tools
+sh download.sh
+# run the demo
+python demo.py
+```
 
-## TODO
-- chrome driver, to caputure mt features
-- theano, lasagne, deep learning scores
-   - stst/main/make_sts_nn.py
-   - stst/main/make_sts_iclr.py
+## Results
+
+you can configure `sts_model.py` to see the performance of different features on STSBenchmark dataset.
+
+### STSBenchmark
+
+| Methods              | Dev    | Test   |
+|----------------------|--------|--------|
+| aligner              | 0.6991 | 0.6379 |
+| idf_aligner          | 0.7969 | 0.7622 |
+| BOWFeature-True      | 0.7584 | 0.6472 |
+| BOWFeature-False     | 0.7788 | 0.6874 |
+| nGramOverlapFeature  | 0.7817 | 0.7453 |
+| BOWFeature           | 0.7639 | 0.6847 |
+| AlignmentFeature     | 0.8163 | 0.7748 |
+| WordEmbeddingFeature | 0.8011 | 0.7128 |
+
+### Reference
+[STSBenchmark board](http://ixa2.si.ehu.es/stswiki/index.php/STSbenchmark)
 
 
-## Embedding Feautures
-- Pre-trained Embedding
-
-## Machine Translation Features
-- chromedriver 2.27 [download](https://chromedriver.storage.googleapis.com/index.html?path=2.27/)
-- autoit
+## Contacts
+Any questions, please feel free to contact us:
+rgtjf1 AT 163 DOT com

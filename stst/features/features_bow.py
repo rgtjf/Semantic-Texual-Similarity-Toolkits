@@ -1,5 +1,6 @@
+from stst import utils
+from stst.data import dict_utils
 from stst.features.features import Feature
-from stst import dict_utils, utils
 
 
 class BOWFeature(Feature):
@@ -16,10 +17,11 @@ class BOWFeature(Feature):
             seqs.append(lemma_sb)
 
         self.idf_weight = utils.idf_calculator(seqs)
+        self.vocab = utils.word2index(self.idf_weight)
 
     def extract(self, train_instance):
         sa, sb = train_instance.get_word(type='lemma', stopwords=self.stopwords, lower=True)
-        features, infos = utils.sentence_vectorize_features(sa, sb, self.idf_weight)
+        features, infos = utils.sentence_vectorize_features(sa, sb, self.idf_weight, self.vocab, convey='idf')
         return features, infos
 
 

@@ -12,8 +12,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
-from stst import utils, config
-from stst.features.features import Feature
+from stst import utils
+from stst.modules.features import Feature
+from stst import config
 
 
 class AsiyaDriver(object):

@@ -3,8 +3,9 @@ from __future__ import print_function
 
 from collections import Counter
 
+from stst import utils
+from stst.data import dict_utils
 from stst.features.features import Feature
-from stst import dict_utils, utils
 
 
 class nGramOverlapFeature(Feature):
@@ -28,12 +29,12 @@ class nGramOverlapFeature(Feature):
 
 
 class nCharGramOverlapFeature(Feature):
+    """nCharGramOverlapFeature"""
 
     def __init__(self, stopwords, **kwargs):
         super(nCharGramOverlapFeature, self).__init__(**kwargs)
         self.stopwords = stopwords
         self.feature_name = self.feature_name + '-%s'%stopwords
-
 
     def extract(self, train_instance):
         char_sa, char_sb = train_instance.get_char()
@@ -97,12 +98,12 @@ class nGramOverlapBeforeStopwordsFeature(Feature):
         return f1, info
 
 
-class WeightednGramMatchFeature(Feature):
+class WeightednGramOverlapFeature(Feature):
     """
     Word is lower, not remove stopwords
     """
     def __init__(self, type, **kwargs):
-        super(WeightednGramMatchFeature, self).__init__(**kwargs)
+        super(WeightednGramOverlapFeature, self).__init__(**kwargs)
         self.type=type
         self.feature_name = self.feature_name + '-%s'%type
 

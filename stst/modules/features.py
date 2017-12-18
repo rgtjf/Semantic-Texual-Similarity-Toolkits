@@ -10,6 +10,7 @@ from stst import utils
 from stst import config
 
 
+
 class Feature(object):
     def __init__(self,
                  load=True,
@@ -25,7 +26,6 @@ class Feature(object):
         """
         ../resources/data/sts-en-en/.. -> ../features/sts-en-en/..
         """
-
         # Need This to help global function
         self.train_file = train_file
 

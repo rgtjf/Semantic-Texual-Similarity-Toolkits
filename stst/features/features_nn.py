@@ -4,9 +4,13 @@ import json
 from gensim.models import Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
 
-from features import Feature
-from stst import utils, dict_utils, config
-from stst.lib.kernel import vector_kernel as vk
+from .features import Feature
+
+from stst import utils
+from stst.data import dict_utils
+from stst.libs.kernel import vector_kernel as vk
+from stst import config
+
 
 
 """
