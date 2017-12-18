@@ -1,13 +1,15 @@
+# coding: utf8
+
 from stst import utils
 from stst.data import dict_utils
-from stst.features.features import Feature
+from stst.modules.features import Feature
 
 
 class BOWFeature(Feature):
     def __init__(self, stopwords=True, **kwargs):
         super(BOWFeature, self).__init__(**kwargs)
         self.stopwords = stopwords
-        self.feature_name = self.feature_name + '-%s' % (stopwords)
+        self.feature_name += '-%s' % (stopwords)
 
     def extract_information(self, train_instances):
         seqs = []
@@ -26,17 +28,16 @@ class BOWFeature(Feature):
 
 
 class BOWGlobalFeature(Feature):
-    """
-    Idf use all sentences other than these in one corpus(file),
+    """Idf use all sentences other than these in one corpus(file),
     however BOWFeature is superior than this BOWGlobalFeature
     """
+
     def __init__(self, **kwargs):
         super(BOWGlobalFeature, self).__init__(**kwargs)
 
-
     def extract(self, train_instance):
         idf_weight = dict_utils.DictLoader().load_dict('global_idf')
+        vocab = utils.word2index(idf_weight)
         sa, sb = train_instance.get_word(type='lemma', stopwords=True, lower=True)
-        features, infos = utils.sentence_vectorize_features(sa, sb, idf_weight)
-
+        features, infos = utils.sentence_vectorize_features(sa, sb, idf_weight, vocab, convey='idf')
         return features, infos

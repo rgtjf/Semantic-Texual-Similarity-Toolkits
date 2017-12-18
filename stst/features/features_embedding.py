@@ -1,7 +1,8 @@
+# coding: utf8
 import nltk
 import numpy as np
 
-from stst.features.features import Feature
+from stst.modules.features import Feature
 from stst.libs.kernel import vector_kernel as vk
 from stst import utils
 
@@ -24,16 +25,20 @@ def pooling(word_embs, dim, pooling_types):
     return vec
 
 
-def minavgmaxpooling(word_list, w2i, embeddings, dim, convey, idf_weight):
-    word_embs = []
-    for word in word_list:
-        # gain word vector
-        w2v = embeddings[w2i[word]]
+def minavgmaxpooling(word_list, stoi, embeddings, dim, convey, idf_weight):
 
-        # gain weight of word
-        default_idf_weight = min(idf_weight.values())
+    word_embs = []
+    min_idf_weight = min(idf_weight.values())
+
+    for word in word_list:
+        if word not in stoi:
+            continue
+
+        # gain word vector
+        w2v = embeddings[stoi[word]]
+
         if convey == 'idf':
-            w = idf_weight.get(word, default_idf_weight)
+            w = idf_weight.get(word, min_idf_weight)
         else:
             raise NotImplementedError
 
@@ -51,43 +56,42 @@ def minavgmaxpooling(word_list, w2i, embeddings, dim, convey, idf_weight):
 
 
 class MinAvgMaxEmbeddingFeature(Feature):
-    def __init__(self, emb_name, dim, emb_file, binary=False, **kwargs):
+
+    def __init__(self, emb_name, dim, emb_file, word_type, **kwargs):
         super(MinAvgMaxEmbeddingFeature, self).__init__(**kwargs)
         self.emb_name = emb_name
         self.dim = dim
         self.emb_file = emb_file
-        self.binary = binary
 
-        self.word_type = 'word'
+        self.word_type = word_type
         self.stopwords = True
         self.lower = True
-
-        self.feature_name = self.feature_name + '-%s' % (emb_name)
+        self.binary = True if 'bin' in emb_file else False
+       
+        self.feature_name += '-%s-%s' % (emb_name, word_type)
 
     def extract_information(self, train_instances):
         seqs = []
         for train_instance in train_instances:
             word_sa, word_sb = train_instance.get_word(type=self.word_type,
-                                                        stopwords=self.stopwords,
-                                                        lower=self.lower)
+                                                       stopwords=self.stopwords,
+                                                       lower=self.lower)
             seqs.append(word_sa)
             seqs.append(word_sb)
-
         self.idf_weight = utils.idf_calculator(seqs)
-        self.word2index = {word:index for index, word in enumerate(self.idf_weight.keys())}
-        self.embeddings = utils.load_word_embedding(self.word2index, self.emb_file, self.dim, self.binary)
+        self.vocab = utils.word2index(self.idf_weight)
+        self.vocab, self.embeddings = utils.load_word_embedding(self.vocab, self.emb_file)
+        # self.embeddings = utils.load_embedding_from_text(self.emb_file)
 
 
     def extract(self, train_instance):
 
         word_sa, word_sb = train_instance.get_word(type=self.word_type,
-                                                    stopwords=self.stopwords,
-                                                    lower=self.lower)
-
-
-        pooling_vec_sa = minavgmaxpooling(word_sa, self.word2index, self.embeddings, self.dim,
+                                                   stopwords=self.stopwords,
+                                                   lower=self.lower)
+        pooling_vec_sa = minavgmaxpooling(word_sa, self.vocab, self.embeddings, self.dim,
                                           convey='idf', idf_weight=self.idf_weight)
-        pooling_vec_sb = minavgmaxpooling(word_sb, self.word2index, self.embeddings, self.dim,
+        pooling_vec_sb = minavgmaxpooling(word_sb, self.vocab, self.embeddings, self.dim,
                                           convey='idf', idf_weight=self.idf_weight)
         all_feats, all_names = vk.get_all_kernel(pooling_vec_sa, pooling_vec_sb)
         features = all_feats

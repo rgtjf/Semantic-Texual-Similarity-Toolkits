@@ -1,5 +1,5 @@
 from stst.data import dict_utils
-from stst.features.features import Feature
+from stst.modules.features import Feature
 
 
 class NegativeFeature(Feature):

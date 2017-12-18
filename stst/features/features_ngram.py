@@ -3,20 +3,21 @@ from __future__ import print_function
 
 from collections import Counter
 
+from stst.modules.features import Feature
 from stst import utils
 from stst.data import dict_utils
-from stst.features.features import Feature
 
 
 class nGramOverlapFeature(Feature):
 
     def __init__(self, type, **kwargs):
         """
-        :param type: word or lemma
+        Args:
+            type: word or lemma
         """
         super(nGramOverlapFeature, self).__init__(**kwargs)
         self.type = type
-        self.feature_name = self.feature_name + '-%s'%type
+        self.feature_name += '-%s'%type
 
     def extract(self, train_instance):
         sa, sb = train_instance.get_word(type=self.type, stopwords=True)
@@ -34,7 +35,7 @@ class nCharGramOverlapFeature(Feature):
     def __init__(self, stopwords, **kwargs):
         super(nCharGramOverlapFeature, self).__init__(**kwargs)
         self.stopwords = stopwords
-        self.feature_name = self.feature_name + '-%s'%stopwords
+        self.feature_name += '-%s'%stopwords
 
     def extract(self, train_instance):
         char_sa, char_sb = train_instance.get_char()
@@ -48,14 +49,12 @@ class nCharGramOverlapFeature(Feature):
 
 
 class nGramOverlapBeforeStopwordsFeature(Feature):
-    """
-    Word is lower, not remove stopwords
-    """
+    """Word is lower, not remove stopwords"""
 
     def __init__(self, type, **kwargs):
         super(nGramOverlapBeforeStopwordsFeature, self).__init__(**kwargs)
         self.type = type
-        self.feature_name = self.feature_name + '-%s'%type
+        self.feature_name += '-%s'%type
 
     def extract(self, train_instance):
         sa, sb = train_instance.get_word(type=self.type, lower=True)
@@ -99,13 +98,12 @@ class nGramOverlapBeforeStopwordsFeature(Feature):
 
 
 class WeightednGramOverlapFeature(Feature):
-    """
-    Word is lower, not remove stopwords
-    """
+    """Word is lower, not remove stopwords"""
+
     def __init__(self, type, **kwargs):
         super(WeightednGramOverlapFeature, self).__init__(**kwargs)
         self.type=type
-        self.feature_name = self.feature_name + '-%s'%type
+        self.feature_name += '-%s' % type
 
     def extract_information(self, train_instances):
         seqs = []
@@ -126,15 +124,16 @@ class WeightednGramOverlapFeature(Feature):
 
     @staticmethod
     def weighted_ngram_match(sa, sb, n, idf_weight):
-
+        """weighted_ngram_match
+        """
         nga = utils.make_ngram(sa, n)
         ngb = utils.make_ngram(sb, n)
-        default_idf_weight = min(idf_weight.values())
+        min_idf_weight = min(idf_weight.values())
 
         def calc_ngram_idf(ngram):
             res = 0.0
             for ng in ngram:
-                res += idf_weight.get(ng, default_idf_weight)
+                res += idf_weight.get(ng, min_idf_weight)
             return res
 
         idf_sa, idf_sb = 0.0, 0.0

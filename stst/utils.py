@@ -31,6 +31,7 @@ Version 1.0
 from __future__ import print_function
 
 import datetime
+import io
 import time
 import csv, math
 import codecs
@@ -43,8 +44,12 @@ import os
 import pickle
 
 import six
+import array
+import pyprind
 
 from stst.libs.kernel import vector_kernel as vk
+
+logger = logging.getLogger(__name__)
 
 
 def fn_timer(function):
@@ -263,24 +268,24 @@ def vectorize(sentence, idf_weight, vocab, convey='idf'):
 
 def vector_similarity(vec1, vec2, normlize=True):
     """
-    :return:
-     example:
+    Next is a example:
+    Args:   
         vec1 = [0, 1]
         vec2 = [1, 0]
-        return: ['1.414', '1.0', ...], ['euclidean', 'cosine', ...]
-
-        which means:
-            euclidean 1.41421356237
-            cosine 1.0
-            manhattan 2
-            chebyshev_distance 1
-            spearmanr -1.0
-            kendalltau -1.0
-            pearsonr -1.0
-            polynomial 1.0
-            rbf 0.493068691395
-            laplacian 0.367879441171
-            sigmoid 0.761594155956
+    Returns:
+        ['1.414', '1.0', ...], ['euclidean', 'cosine', ...]
+    which means:
+        euclidean 1.41421356237
+        cosine 1.0
+        manhattan 2
+        chebyshev_distance 1
+        spearmanr -1.0
+        kendalltau -1.0
+        pearsonr -1.0
+        polynomial 1.0
+        rbf 0.493068691395
+        laplacian 0.367879441171
+        sigmoid 0.761594155956
     """
     if normlize:
         vec1 = vk.normalize(vec1)
@@ -389,104 +394,176 @@ def check_dir_exist(dir_path):
 # Word Embedding Utils
 #############################################
 
-
-def load_word_embedding(vocab, emb_file, n_dim,
-                        pad_word='__PAD__', unk_word='__UNK__'):
+def load_word_embedding(vocab, emb_file, pad_word='__PAD__', unk_word='__UNK__'):
     """
-    UPDATE_1: fix the word embedding
-    ===
-    UPDATE_0: save the oov words in oov.p (pickle)
-    Pros: to analysis why the this happen !!!
-    ===
-    :param vocab: dict, vocab['__UNK__'] = 0
-    :param emb_file: str, file_path
-    :param n_dim:
-    :param pad_word
-    :param unk_word
-    :return: np.array(n_words, n_dim)
+    Pros:
+        Save the oov words in oov.p for further analysis.
+        Add {0: pad_word, 1: unk_word} into vocab if needed
+    Refs:
+        class Vectors, https://github.com/pytorch/text/blob/master/torchtext/vocab.py
+    Args:
+        vocab: dict,
+        emb_file: file, path to file of pre-trained word2vec/glove/fasttext
+        pad_word:
+        unk_word:
+    Returns:
+        vocab, vectors
     """
-    print('Load word embedding: %s' % emb_file)
-    assert vocab[pad_word] == 0
-    assert vocab[unk_word] == 1
+    if pad_word not in vocab:
+        vocab = {k: v+2 for k, v in vocab.items()}
+        vocab[pad_word] = 0
+        vocab[unk_word] = 1
 
     pre_trained = {}
     n_words = len(vocab)
+    embeddings = None  # (n_words, n_dim)
 
-    embeddings = np.random.uniform(-0.25, 0.25, (n_words, n_dim))
-    # embeddings[0, ] = np.zeros(n_dim)
+    # str call is necessary for Python 2/3 compatibility, since
+    # argument must be Python 2 str (Python 3 bytes) or
+    # Python 3 str (Python 2 unicode)
+    itos, vectors, dim = [], array.array(str('d')), None
 
-    with codecs.open(emb_file, 'r', encoding='utf8') as f:
-        for idx, line in enumerate(f):
-            if idx == 0 and len(line.split()) == 2:
+    # Try to read the whole file with utf-8 encoding.
+    binary_lines = False
+    try:
+        with io.open(emb_file, encoding="utf8") as f:
+            lines = [line for line in f]
+    # If there are malformed lines, read in binary mode
+    # and manually decode each word from utf-8
+    except:
+        logger.warning("Could not read {} as UTF8 file, "
+                        "reading file as bytes and skipping "
+                        "words with malformed UTF8.".format(emb_file))
+        with open(emb_file, 'rb') as f:
+            lines = [line for line in f]
+        binary_lines = True
+
+    logger.info("Loading vectors from {}".format(emb_file))
+
+    process_bar = pyprind.ProgPercent(len(lines))
+    for line in lines:
+        process_bar.update()
+        # Explicitly splitting on " " is important, so we don't
+        # get rid of Unicode non-breaking spaces in the vectors.
+        entries = line.rstrip().split(b" " if binary_lines else " ")
+
+        word, entries = entries[0], entries[1:]
+        if dim is None and len(entries) > 1:
+            dim = len(entries)
+            # init the embeddings
+            embeddings = np.random.uniform(-0.25, 0.25, (n_words, dim))
+            embeddings[0,] = np.zeros(dim)
+
+        elif len(entries) == 1:
+            logger.warning("Skipping token {} with 1-dimensional "
+                            "vector {}; likely a header".format(word, entries))
+            continue
+        elif dim != len(entries):
+            raise RuntimeError(
+                "Vector for token {} has {} dimensions, but previously "
+                "read vectors have {} dimensions. All vectors must have "
+                "the same number of dimensions.".format(word, len(entries), dim))
+
+        if binary_lines:
+            try:
+                if isinstance(word, six.binary_type):
+                    word = word.decode('utf-8')
+
+            except:
+                logger.info("Skipping non-UTF8 token {}".format(repr(word)))
                 continue
-            sp = line.rstrip().split(' ')
 
-            if len(sp) < n_dim:
-                print('%s len < ndim' % line)
-                continue
-
-            pos = len(sp) - n_dim
-            if len(sp) != n_dim + 1:
-                print(len(sp))
-                print(sp[:pos])
-
-            w = ' '.join(sp[0:pos])
-            emb = [float(x) for x in sp[pos:]]
-
-            if w in vocab and w not in pre_trained:
-                embeddings[vocab[w]] = emb
-                pre_trained[w] = 1
+        if word in vocab and word not in pre_trained:
+            embeddings[vocab[word]] = [float(x) for x in entries]
+            pre_trained[word] = 1
 
     pre_trained_len = len(pre_trained)
-
     print('Pre-trained: {}/{} {:.2f}'.format(pre_trained_len, n_words, pre_trained_len * 100.0 / n_words))
 
     oov_word_list = [w for w in vocab if w not in pre_trained]
     print('oov word list example (30): ', oov_word_list[:30])
-
     pickle.dump(oov_word_list, open('./oov.p', 'wb'))
 
     embeddings = np.array(embeddings, dtype=np.float32)
-    return embeddings
+    return vocab, embeddings
 
 
-def load_embedding_from_text(emb_file, n_dim,
-                             pad_word='__PAD__', unk_word='__UNK__'):
+def load_embedding_from_text(emb_file, pad_word='__PAD__', unk_word='__UNK__'):
     """
-    :return: embed: numpy, vocab2id: dict
+    Add {0: pad_word, 1: unk_word} into stoi
+    Note: didn't support GoogleNews-vectors-negative300.bin. 
+        This can firstly transformed into GoogleNews-vectors-negative300.txt using `bin2plain.py`.
+    Refs:
+        class Vectors, https://github.com/pytorch/text/blob/master/torchtext/vocab.py
+    Args:
+        emb_file: directory for cached vectors
+        pad_word:
+        unk_word:
+    Returns:
+        stoi, vectors
     """
-    print('==> loading embed from txt')
+    # str call is necessary for Python 2/3 compatibility, since
+    # argument must be Python 2 str (Python 3 bytes) or
+    # Python 3 str (Python 2 unicode)
+    itos, vectors, dim = [], array.array(str('d')), None
 
-    vocab2id = {}
-    embed = []
-    word_id = 0
+    # Try to read the whole file with utf-8 encoding.
+    binary_lines = False
+    try:
+        with io.open(emb_file, encoding="utf8") as f:
+            lines = [line for line in f]
+    # If there are malformed lines, read in binary mode
+    # and manually decode each word from utf-8
+    except:
+        logger.warning("Could not read {} as UTF8 file, "
+                        "reading file as bytes and skipping "
+                        "words with malformed UTF8.".format(emb_file))
+        with open(emb_file, 'rb') as f:
+            lines = [line for line in f]
+        binary_lines = True
 
-    vocab2id[pad_word] = word_id
-    embed.append(np.zeros(shape=[n_dim, ], dtype=np.float32))
+    logger.info("Loading vectors from {}".format(emb_file))
 
-    word_id += 1
-    vocab2id[unk_word] = word_id
-    embed.append(np.random.uniform(-0.25, 0.25, size=[n_dim, ]))
+    process_bar = pyprind.ProgPercent(len(lines))
+    for line in lines:
+        process_bar.update()
+        # Explicitly splitting on " " is important, so we don't
+        # get rid of Unicode non-breaking spaces in the vectors.
+        entries = line.rstrip().split(b" " if binary_lines else " ")
 
-    with codecs.open(emb_file, 'r', encoding='utf8') as f:
-        for idx, line in enumerate(f):
-            if idx == 0 and len(line.split()) == 2:
-                print('embedding info: ', line)
+        word, entries = entries[0], entries[1:]
+        if dim is None and len(entries) > 1:
+            dim = len(entries)
+            # add pad_word
+            itos.append(pad_word)
+            vectors.extend(np.zeros(dim, ))
+            # add unk_word
+            itos.append(unk_word)
+            vectors.extend(np.random.uniform(-0.25, 0.25, (dim, )))
+
+        elif len(entries) == 1:
+            logger.warning("Skipping token {} with 1-dimensional "
+                            "vector {}; likely a header".format(word, entries))
+            continue
+        elif dim != len(entries):
+            raise RuntimeError(
+                "Vector for token {} has {} dimensions, but previously "
+                "read vectors have {} dimensions. All vectors must have "
+                "the same number of dimensions.".format(word, len(entries), dim))
+
+        if binary_lines:
+            try:
+                if isinstance(word, six.binary_type):
+                    word = word.decode('utf-8')
+            except:
+                logger.info("Skipping non-UTF8 token {}".format(repr(word)))
                 continue
-            sp = line.rstrip().split()
+        vectors.extend(float(x) for x in entries)
+        itos.append(word)
 
-            if len(sp) != n_dim + 1:
-                print(sp[0:len(sp) - n_dim])
-
-            w = ''.join(sp[0:len(sp) - n_dim])
-            emb = [float(x) for x in sp[len(sp) - n_dim:]]
-
-            word_id += 1
-            vocab2id[w] = word_id
-            embed.append(emb)
-
-    print('==> finished load input embed from txt')
-    return np.array(embed, dtype=np.float32), vocab2id
+    stoi = {word: i for i, word in enumerate(itos)}
+    vectors = np.array(vectors, dtype=np.float32).reshape((-1, dim))
+    return stoi, vectors
 
 
 #############################################

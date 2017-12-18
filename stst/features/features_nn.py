@@ -1,22 +1,18 @@
 # coding: utf8
+"""
+1. 每个文档自己训练一个Doc2Vec
+2. 所有文档一起训练一个Doc2Vec
+"""
 import json
 
 from gensim.models import Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
 
-from .features import Feature
-
+from stst.modules.features import Feature
 from stst import utils
+from stst import config
 from stst.data import dict_utils
 from stst.libs.kernel import vector_kernel as vk
-from stst import config
-
-
-
-"""
-1. 每个文档自己训练一个Doc2Vec
-2. 所有文档一起训练一个Doc2Vec
-"""
 
 
 class Doc2VecFeature(Feature):
@@ -61,6 +57,7 @@ class Doc2VecFeature(Feature):
     #     features = [ Feature._feat_list_to_string(feature) for feature in features ]
     #
     #     return features, 1, _n_instance
+
 
 class Doc2VecGlobalFeature(Feature):
 

@@ -10,7 +10,6 @@ from stst import utils
 from stst import config
 
 
-
 class Feature(object):
     def __init__(self,
                  load=True,

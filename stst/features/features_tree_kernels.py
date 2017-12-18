@@ -1,4 +1,6 @@
-from stst.features.features import Feature
+# coding: utf8
+
+from stst.modules.features import Feature
 from stst.libs.kernel import tree, tree_kernels
 
 

@@ -5,8 +5,8 @@ import math
 import os
 
 import stst
-import stst.config
-from stst import utils, config
+from stst import utils
+from stst import config
 
 
 @utils.singleton
@@ -84,9 +84,8 @@ class DictCreater(object):
 
     def _create_dict(func):
         """
-        Python 装饰器
+        Python decoder
         """
-
         def __create_dict(*args, **kwargs):
             print("==" * 40)
             print("Create dict for %s ...  " % (func.__name__.replace("create_", "")))
@@ -139,7 +138,6 @@ class DictCreater(object):
 
         stopwords = stanford_stopwords
         return stopwords
-
 
     @_create_dict
     def create_global_idf(self, file_list):

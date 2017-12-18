@@ -96,6 +96,10 @@ ENV/
 stst.egg-info/
 ./iclr2016-test/data/
 .vscode
+
+
+
 tests/
 main/
 nn_lasagne/
+test*.py

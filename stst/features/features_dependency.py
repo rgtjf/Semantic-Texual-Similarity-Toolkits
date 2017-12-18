@@ -1,4 +1,4 @@
-from stst.features.features import Feature
+from stst.modules.features import Feature
 from stst import utils
 
 
@@ -6,7 +6,7 @@ class DependencyGramFeature(Feature):
     def __init__(self, convey='count', **karwgs):
         super(DependencyGramFeature, self).__init__(**karwgs)
         self.convey = convey
-        self.feature_name = self.feature_name + '-%s' % (convey)
+        self.feature_name += '-%s' % (convey)
 
     def extract_information(self, train_instances):
         seqs = []
@@ -17,6 +17,7 @@ class DependencyGramFeature(Feature):
             seqs.append(dep_sa)
             seqs.append(dep_sb)
         self.idf_weight = utils.idf_calculator(seqs)
+        self.vocab = utils.word2index(self.idf_weight)
 
     def extract(self, train_instance):
         dep_sa, dep_sb = train_instance.get_dependency()

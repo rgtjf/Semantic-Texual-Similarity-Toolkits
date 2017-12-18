@@ -1,7 +1,7 @@
 # coding: utf8
 from __future__ import print_function
 
-from stst.features.features import Feature
+from stst.modules.features import Feature
 from stst import utils
 from stst.libs.kernel import vector_kernel as vk
 
@@ -111,8 +111,8 @@ class POSNounEmbeddingFeature(Feature):
             seqs.append(sb)
 
         self.idf_weight = utils.idf_calculator(seqs)
-        self.word2index = {word:index for index, word in enumerate(self.idf_weight.keys())}
-        self.embeddings = utils.load_word_embedding(self.word2index, self.emb_file, self.dim, self.binary)
+        self.vocab = utils.word2index(self.idf_weight)
+        self.embeddings = utils.load_word_embedding(self.vocab, self.emb_file, self.dim, self.binary)
 
     def extract(self, train_instance):
         from stst.features.features_embedding import minavgmaxpooling
@@ -121,12 +121,12 @@ class POSNounEmbeddingFeature(Feature):
         sa = [w for w, tag in pos_sa if tag == 'n']
         sb = [w for w, tag in pos_sb if tag == 'n']
 
-        pooling_vec_sa = minavgmaxpooling(sa, self.word2index, self.embeddings, self.dim,
+        pooling_vec_sa = minavgmaxpooling(sa, self.vocab, self.embeddings, self.dim,
                                           convey='idf', idf_weight=self.idf_weight)
-        pooling_vec_sb = minavgmaxpooling(sb, self.word2index, self.embeddings, self.dim,
+        pooling_vec_sb = minavgmaxpooling(sb, self.vocab, self.embeddings, self.dim,
                                           convey='idf', idf_weight=self.idf_weight)
+
         all_feats, all_names = vk.get_all_kernel(pooling_vec_sa, pooling_vec_sb)
         features = all_feats
-
         infos = [self.emb_name]
         return features, infos
