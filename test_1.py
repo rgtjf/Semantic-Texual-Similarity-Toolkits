@@ -12,6 +12,7 @@ model.add(stst.BOWGlobalFeature(stopwords=False))
 model.add(stst.BOWGlobalFeature(stopwords=True))
 
 
+
 # train and test
 train_file = './data/stsbenchmark/sts-train.csv'
 dev_file  = './data/stsbenchmark/sts-dev.csv'
