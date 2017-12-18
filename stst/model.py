@@ -5,7 +5,7 @@ import os
 import random
 
 from stst import utils, config
-from stst.module.features import Feature
+from stst.features.features import Feature
 
 
 class Model(object):
