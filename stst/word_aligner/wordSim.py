@@ -1,27 +1,26 @@
+# coding: utf8
 import os
-from stst.lib.word_aligner.config import *
+from .config import *
 
-################################################################################
-def loadPPDB(ppdbFileName = 'stst/lib/word_aligner/Resources/ppdb-1.0-xxxl-lexical.extended.synonyms.uniquepairs'):
+def loadPPDB(ppdbFileName = 'Resources/ppdb-1.0-xxxl-lexical.extended.synonyms.uniquepairs'):
     global ppdbSim
     global ppdbDict
 
     count = 0
 
-    # cur_dir = os.path.dirname(__file__)
-    # ppdbFileName = os.path.join(cur_dir, ppdbFileName)
+    cur_dir = os.path.dirname(__file__)
+    ppdbFileName = os.path.join(cur_dir, ppdbFileName)
 
-    ppdbFile = open(ppdbFileName, 'r')
+    ppdbFile = open(ppdbFileName, 'r', encoding='utf8')
     for line in ppdbFile:
         tokens = line.split()
+        if len(tokens) < 2:
+            continue
         tokens[1] = tokens[1].strip()
         ppdbDict[(tokens[0], tokens[1])] = ppdbSim
         count += 1
 
-################################################################################
 
-
-################################################################################
 def presentInPPDB(word1, word2):
 
     global ppdbDict
@@ -31,15 +30,13 @@ def presentInPPDB(word1, word2):
     if (word2.lower(), word1.lower()) in ppdbDict:
         return True
 
-################################################################################
 
-
-##############################################################################################################################
 def wordRelatedness(word1, pos1, word2, pos2):
 
     global stemmer
     global ppdbSim
     global punctuations
+    global stopwords
 
     if len(word1) > 1:
         canonicalWord1 = word1.replace('.', '')

@@ -1,74 +1,79 @@
 # coding: utf8
 
-##############################################################################################################################
-def nerWordAnnotator(parseResult):
+
+def ner_word_annotator(parse_sent):
+    """
+    Return NER words
+    Args:
+        parse_sent: json
+
+    Returns:
+        List of NER words: [[char_begin, char_end], word_index, word, ner]
+    """
     res = []
-    wordIndex = 1
-    for i in range(len(parseResult['sentences'][0]['tokens'])):
+    word_index = 1
+    for i in range(len(parse_sent['sentences'][0]['tokens'])):
         tag = [[
-            parseResult['sentences'][0]['tokens'][i]['characterOffsetBegin'],
-            parseResult['sentences'][0]['tokens'][i]['characterOffsetEnd']
-        ],
-            wordIndex,
-            parseResult['sentences'][0]['tokens'][i]['word'], parseResult['sentences'][0]['tokens'][i]['ner']]
-        wordIndex += 1
+            parse_sent['sentences'][0]['tokens'][i]['characterOffsetBegin'],
+            parse_sent['sentences'][0]['tokens'][i]['characterOffsetEnd']
+            ],
+            word_index,
+            parse_sent['sentences'][0]['tokens'][i]['word'],
+            parse_sent['sentences'][0]['tokens'][i]['ner']]
+        word_index += 1
         if tag[3] != 'O':
             res.append(tag)
     return res
 
 
-##############################################################################################################################
-
-
-##############################################################################################################################
-def ner(parseResult):
-    nerWordAnnotations = nerWordAnnotator(parseResult)
+def ner(parse_sent):
+    """
+    ner
+    Args:
+        parse_sent:
+    Returns:
+    """
+    nerWordAnnotations = ner_word_annotator(parse_sent)
 
     namedEntities = []
+
+    # current lists
     currentNE = []
     currentCharacterOffsets = []
     currentWordOffsets = []
 
     for i in range(len(nerWordAnnotations)):
 
-        if i == 0:
+        if i == 0 or nerWordAnnotations[i][3] == nerWordAnnotations[i - 1][3] \
+                and nerWordAnnotations[i][1] == nerWordAnnotations[i - 1][1] + 1:
             currentNE.append(nerWordAnnotations[i][2])
             currentCharacterOffsets.append(nerWordAnnotations[i][0])
             currentWordOffsets.append(nerWordAnnotations[i][1])
-            if len(nerWordAnnotations) == 1:
-                namedEntities.append(
-                    [currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i - 1][3]])
-                break
-            continue
-
-        if nerWordAnnotations[i][3] == nerWordAnnotations[i - 1][3] and nerWordAnnotations[i][1] == \
-                        nerWordAnnotations[i - 1][1] + 1:
-            currentNE.append(nerWordAnnotations[i][2])
-            currentCharacterOffsets.append(nerWordAnnotations[i][0])
-            currentWordOffsets.append(nerWordAnnotations[i][1])
-            if i == len(nerWordAnnotations) - 1:
-                namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i][3]])
         else:
+            # add the previous set into namedEntities
             namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i - 1][3]])
             currentNE = [nerWordAnnotations[i][2]]
-            currentCharacterOffsets = []
-            currentCharacterOffsets.append(nerWordAnnotations[i][0])
-            currentWordOffsets = []
-            currentWordOffsets.append(nerWordAnnotations[i][1])
-            if i == len(nerWordAnnotations) - 1:
-                namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i][3]])
+            currentCharacterOffsets = [nerWordAnnotations[i][0]]
+            currentWordOffsets = [nerWordAnnotations[i][1]]
+
+        # add the last ner word
+        if i == len(nerWordAnnotations) - 1:
+            namedEntities.append([currentCharacterOffsets, currentWordOffsets, currentNE, nerWordAnnotations[i][3]])
 
     return namedEntities
 
 
-##############################################################################################################################
-
-
-##############################################################################################################################
 def posTag(parseResult):
-    res = []
+    """
+    Args:
+        parseResult:
+    Return:
 
+    """
+
+    res = []
     wordIndex = 1
+
     for i in range(len(parseResult['sentences'][0]['tokens'])):
         tag = [
                 [
@@ -85,15 +90,16 @@ def posTag(parseResult):
     return res
 
 
-##############################################################################################################################
-
-
-
-
-##############################################################################################################################
 def lemmatize(parseResult):
-    res = []
+    """
 
+    Args:
+        parseResult:
+
+    Returns:
+
+    """
+    res = []
     wordIndex = 1
     for i in range(len(parseResult['sentences'][0]['tokens'])):
         tag = [
@@ -107,20 +113,18 @@ def lemmatize(parseResult):
             ]
         wordIndex += 1
         res.append(tag)
-
     return res
 
 
-##############################################################################################################################
-
-
-
-
-
-##############################################################################################################################
 def dependencyParseAndPutOffsets(parseResult):
-    # returns dependency parse of the sentence whhere each item is of the form (rel, left{charStartOffset, charEndOffset, wordNumber}, right{charStartOffset, charEndOffset, wordNumber})
+    """
+    Args:
+        parseResult:
 
+    Returns:
+        (rel, left{charStartOffset, charEndOffset, wordNumber}, right{charStartOffset, charEndOffset, wordNumber})
+        dependency parse of the sentence where each item is of the form
+    """
     dParse = parseResult['sentences'][0]['basic-dependencies']
     tokens = parseResult['sentences'][0]['tokens']
 
@@ -157,17 +161,19 @@ def dependencyParseAndPutOffsets(parseResult):
     return result
 
 
-##############################################################################################################################
-
-
-
-##############################################################################################################################
 def findParents(dependencyParse, wordIndex, word):
-    # word index assumed to be starting at 1
-    # the third parameter is needed because of the collapsed representation of the dependencies...
+    """
+    Note: word index assumed to be starting at 1
+    the third parameter is needed because of the collapsed representation of the dependencies...
+    Args:
+        dependencyParse:
+        wordIndex:
+        word:
 
-    tokensWithIndices = ((int(item[2].split('{')[1].split('}')[0].split(' ')[2]), item[2].split('{')[0]) for item in
-                         dependencyParse)
+    Returns:
+
+    """
+    tokensWithIndices = ((int(item[2].split('{')[1].split('}')[0].split(' ')[2]), item[2].split('{')[0]) for item in dependencyParse)
     tokensWithIndices = list(set(tokensWithIndices))
     tokensWithIndices = sorted(tokensWithIndices, key=lambda item: item[0])
 
@@ -208,15 +214,18 @@ def findParents(dependencyParse, wordIndex, word):
     return parentsWithRelation
 
 
-##############################################################################################################################
-
-
-
-
-##############################################################################################################################
 def findChildren(dependencyParse, wordIndex, word):
-    # word index assumed to be starting at 1
-    # the third parameter is needed because of the collapsed representation of the dependencies...
+    """
+    Note: word index assumed to be starting at 1
+    the third parameter is needed because of the collapsed representation of the dependencies...
+    Args:
+        dependencyParse:
+        wordIndex:
+        word:
+
+    Returns:
+
+    """
 
     tokensWithIndices = ((int(item[2].split('{')[1].split('}')[0].split(' ')[2]), item[2].split('{')[0]) for item in
                          dependencyParse)
@@ -261,4 +270,16 @@ def findChildren(dependencyParse, wordIndex, word):
     return childrenWithRelation
 
 
-##############################################################################################################################
+if __name__ == '__main__':
+    parsetext = """{"sentences": [{"tokens": [{"word": "I", "lemma": "I", "pos": "PRP", "index": 1, "originalText": "I", "before": "", "after": " ", "characterOffsetBegin": 0, "ner": "O", "characterOffsetEnd": 1}, {"word": "love", "lemma": "love", "pos": "VBP", "index": 2, "originalText": "love", "before": " ", "after": " ", "characterOffsetBegin": 2, "ner": "O", "characterOffsetEnd": 6}, {"word": "China", "lemma": "China", "pos": "NNP", "index": 3, "originalText": "China", "before": " ", "after": "", "characterOffsetBegin": 7, "ner": "LOCATION", "characterOffsetEnd": 12}, {"word": ".", "lemma": ".", "pos": ".", "index": 4, "originalText": ".", "before": "", "after": "", "characterOffsetBegin": 12, "ner": "O", "characterOffsetEnd": 13}], "collapsed-ccprocessed-dependencies": [{"dependentGloss": "love", "dependent": 2, "governorGloss": "ROOT", "governor": 0, "dep": "ROOT"}, {"dependentGloss": "I", "dependent": 1, "governorGloss": "love", "governor": 2, "dep": "nsubj"}, {"dependentGloss": "China", "dependent": 3, "governorGloss": "love", "governor": 2, "dep": "dobj"}, {"dependentGloss": ".", "dependent": 4, "governorGloss": "love", "governor": 2, "dep": "punct"}], "collapsed-dependencies": [{"dependentGloss": "love", "dependent": 2, "governorGloss": "ROOT", "governor": 0, "dep": "ROOT"}, {"dependentGloss": "I", "dependent": 1, "governorGloss": "love", "governor": 2, "dep": "nsubj"}, {"dependentGloss": "China", "dependent": 3, "governorGloss": "love", "governor": 2, "dep": "dobj"}, {"dependentGloss": ".", "dependent": 4, "governorGloss": "love", "governor": 2, "dep": "punct"}], "index": 0, "basic-dependencies": [{"dependentGloss": "love", "dependent": 2, "governorGloss": "ROOT", "governor": 0, "dep": "ROOT"}, {"dependentGloss": "I", "dependent": 1, "governorGloss": "love", "governor": 2, "dep": "nsubj"}, {"dependentGloss": "China", "dependent": 3, "governorGloss": "love", "governor": 2, "dep": "dobj"}, {"dependentGloss": ".", "dependent": 4, "governorGloss": "love", "governor": 2, "dep": "punct"}]}]}"""
+    import json
+    # l love China.
+    parsetext = json.loads(parsetext)
+
+    print(ner(parsetext))
+    print(posTag(parsetext))
+    print(lemmatize(parsetext))
+    dep = dependencyParseAndPutOffsets(parsetext)
+    print(findParents(dep, 1 + 1, 'love'))
+    print(findChildren(dep, 1 + 1, 'love'))
+    print(len(parsetext['sentences']))

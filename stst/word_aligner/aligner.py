@@ -1,7 +1,8 @@
 # coding: utf8
-from stst.lib.word_aligner.wordSim import *
-from stst.lib.word_aligner.util import *
-from stst.lib.word_aligner.parseUtil import *
+
+from .parseUtil import *
+from .util import *
+from .wordSim import *
 
 
 ##############################################################################################################################

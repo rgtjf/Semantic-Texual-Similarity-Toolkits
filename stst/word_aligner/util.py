@@ -1,8 +1,8 @@
-from stst.lib.word_aligner.config import *
+# coding: utf8
 
-############################################            ##################################################################################
 def isSublist(A, B):
-    # returns True if A is a sublist of B, False otherwise
+    """returns True if A is a sublist of B, False otherwise
+    """
     sub = True
 
     for item in A:
@@ -13,20 +13,18 @@ def isSublist(A, B):
     return sub
 
 
-##############################################################################################################################
-
-
-##############################################################################################################################
-def findAllCommonContiguousSublists(A, B,
-                                    turnToLowerCases=True):  # this is a very inefficient implementation, you can use suffix trees to devise a much faster method
-    # returns all the contiguous sublists in order of decreasing length
-    # output format (0-indexed):
-    # [
-    #    [[indices in 'A' for common sublist 1], [indices in 'B' for common sublist 1]],
-    #    ...,
-    #    [[indices in 'A' for common sublist n], [indices in 'B' for common sublist n]]
-    # ]
-
+def findAllCommonContiguousSublists(A, B, turnToLowerCases=True):
+    """
+    this is a very inefficient implementation, you can use suffix trees to devise a much faster method
+    returns all the contiguous sublists in order of decreasing length
+    Returns:
+        output format (0-indexed):
+        [
+           [[indices in 'A' for common sublist 1], [indices in 'B' for common sublist 1]],
+           ...,
+           [[indices in 'A' for common sublist n], [indices in 'B' for common sublist n]]
+        ]
+    """
     a = []
     b = []
     for item in A:
@@ -76,16 +74,12 @@ def findAllCommonContiguousSublists(A, B,
     return commonContiguousSublists
 
 
-##############################################################################################################################
-
-
-
-##############################################################################################################################
 def findTextualNeighborhood(sentenceDetails, wordIndex, leftSpan, rightSpan):
-    # return the lemmas in the span [wordIndex-leftSpan, wordIndex+rightSpan] and the positions actually available, left and right
-
+    """
+    return the lemmas in the span [wordIndex-leftSpan, wordIndex+rightSpan] and the positions actually available, left and right
+    """
+    global stopwords
     global punctuations
-
     sentenceLength = len(sentenceDetails)
 
     startWordIndex = max(1, wordIndex - leftSpan)
@@ -104,12 +98,9 @@ def findTextualNeighborhood(sentenceDetails, wordIndex, leftSpan, rightSpan):
     return [wordIndices, lemmas, wordIndex - startWordIndex, endWordIndex - wordIndex]
 
 
-##############################################################################################################################
-
-
-##############################################################################################################################
 def isAcronym(word, namedEntity):
-    # returns whether 'word' is an acronym of 'namedEntity', which is a list of the component words
+    """returns whether 'word' is an acronym of 'namedEntity', which is a list of the component words
+    """
     canonicalWord = word.replace('.', '')
     if not canonicalWord.isupper() or len(canonicalWord) != len(namedEntity) or canonicalWord.lower() in ['a', 'i']:
         return False
@@ -121,5 +112,3 @@ def isAcronym(word, namedEntity):
             break
 
     return acronym
-
-##############################################################################################################################

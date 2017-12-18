@@ -85,9 +85,6 @@ def stanford_tokenize(s, type='word'):
     return result
 
 
-
-
-
 if __name__ == '__main__':
 
     parsetext = nlp.parse(u'I love China.')

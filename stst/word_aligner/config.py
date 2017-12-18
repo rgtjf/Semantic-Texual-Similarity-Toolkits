@@ -1,7 +1,8 @@
+# coding: utf8
+
 ppdbDict = {}
 ppdbSim = 0.9
 theta1 = 0.9
-
 
 from nltk.corpus import stopwords
 

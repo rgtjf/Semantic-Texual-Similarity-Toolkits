@@ -7,9 +7,8 @@ import os
 
 import pyprind
 
+from .sent_pair import SentPair
 from stst import utils
-from stst.data_tools.sent_pair import SentPair
-
 
 def load_data(train_file):
     """

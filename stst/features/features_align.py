@@ -3,9 +3,9 @@ import json
 
 import pyprind
 
-from stst.features.features import Feature
 from stst import utils
-from stst.lib.word_aligner import aligner
+from stst.features.features import Feature
+from stst.word_aligner import aligner
 
 
 class AlignmentFeature(Feature):
