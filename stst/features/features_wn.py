@@ -1,3 +1,4 @@
+# coding: utf8
 from stst.modules.features import Feature
 from stst.libs.sentence_similarity.short_sentence_similarity import *
 

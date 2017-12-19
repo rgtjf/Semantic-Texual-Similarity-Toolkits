@@ -11,7 +11,7 @@ model = stst.Model('S1-gb', gb)
 # model = stst.Model('S1-avg', avg)
 
 # Add features to the Model
-model.add(stst.WeightednGramOverlapFeature(type='lemma'))
+# model.add(stst.WeightednGramOverlapFeature(type='lemma'))
 
 '''several nGramOverlapFeatures'''
 model.add(stst.nGramOverlapFeature(type='word'))
@@ -55,7 +55,7 @@ model.add(stst.DependencyRelationFeature(convey='idf'))
 
 model.add(stst.POSLemmaMatchFeature(stopwords=True))
 model.add(stst.POSLemmaMatchFeature(stopwords=False))
-model.add(stst.POSNounEmbeddingFeature('word2vec', 300, word2vec_file, binary=True))
+model.add(stst.POSNounEmbeddingFeature('word2vec', 300, word2vec_file))
 model.add(stst.POSNounEditFeature())
 model.add(stst.POSTreeKernelFeature())
 
@@ -66,11 +66,14 @@ model.add(stst.NegativeFeature())
 
 model.add(stst.AsiyaMTFeature())
 
+model.add(stst.SequenceFeature())
+model.add(stst.SentenceFeature())
+model.add(stst.ShortSentenceFeature())
 
 # sts_tools.feature_importance(model)
-# sts_tools.train_sts(model)
-# sts_tools.dev_sts(model)
-# sts_tools.test_sts(model)
+sts_tools.train_sts(model)
+sts_tools.dev_sts(model)
+sts_tools.test_sts(model)
 
 # sts_tools.hill_climbing(model)
-sts_tools.hill_climbing(model, [0])
+# sts_tools.hill_climbing(model, [0])

@@ -27,8 +27,8 @@ class SentPair(object):
             word_sa, word_sb = self.get_word(type='lemma', stopwords=False, lower=True)
             pos_sa, pos_sb = self.get_word(type='pos', stopwords=False)
 
-        pos_sa = map(utils.get_tag, pos_sa)
-        pos_sb = map(utils.get_tag, pos_sb)
+        pos_sa = map(utils.pos2tag, pos_sa)
+        pos_sb = map(utils.pos2tag, pos_sb)
         # pos_sa, pos_sb = self.get_pos_tag(stopwords=False, lower=True)
         pos_sa = zip(word_sa, pos_sa)
         pos_sb = zip(word_sb, pos_sb)
@@ -135,18 +135,18 @@ class SentPair(object):
     def get_pos_tag(self, stopwords=True):
         if stopwords:
             tokens = self.parse_sa["sentences"][0]["tokens"]
-            pos_sa = [[token['lemma'], utils.get_tag(token['pos'])] for token in tokens if
+            pos_sa = [[token['lemma'], utils.pos2tag(token['pos'])] for token in tokens if
                       token['word'].lower() not in DictLoader().load_dict('stopwords')]
 
             tokens = self.parse_sb["sentences"][0]["tokens"]
-            pos_sb = [[token['lemma'], utils.get_tag(token['pos'])] for token in tokens if
+            pos_sb = [[token['lemma'], utils.pos2tag(token['pos'])] for token in tokens if
                       token['word'].lower() not in DictLoader().load_dict('stopwords')]
         else:
             tokens = self.parse_sa["sentences"][0]["tokens"]
-            pos_sa = [[token['lemma'], utils.get_tag(token['pos'])] for token in tokens]
+            pos_sa = [[token['lemma'], utils.pos2tag(token['pos'])] for token in tokens]
 
             tokens = self.parse_sb["sentences"][0]["tokens"]
-            pos_sb = [[token['lemma'], utils.get_tag(token['pos'])] for token in tokens]
+            pos_sb = [[token['lemma'], utils.pos2tag(token['pos'])] for token in tokens]
 
         return pos_sa, pos_sb
 

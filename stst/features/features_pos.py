@@ -92,14 +92,13 @@ class POSNounEditFeature(Feature):
 
 
 class POSNounEmbeddingFeature(Feature):
-    def __init__(self, emb_name, dim, emb_file, binary=False, **kwargs):
+    def __init__(self, emb_name, dim, emb_file, **kwargs):
         super(POSNounEmbeddingFeature, self).__init__(**kwargs)
         self.emb_name = emb_name
         self.dim = dim
         self.emb_file = emb_file
-        self.binary = binary
 
-        self.feature_name = self.feature_name + '-%s' % (emb_name)
+        self.feature_name += '-%s' % (emb_name)
 
     def extract_information(self, train_instances):
         seqs = []
@@ -110,9 +109,10 @@ class POSNounEmbeddingFeature(Feature):
             seqs.append(sa)
             seqs.append(sb)
 
-        self.idf_weight = utils.idf_calculator(seqs)
-        self.vocab = utils.word2index(self.idf_weight)
-        self.embeddings = utils.load_word_embedding(self.vocab, self.emb_file, self.dim, self.binary)
+        idf_weight = utils.idf_calculator(seqs)
+        vocab = utils.word2index(idf_weight)
+        self.idf_weight = idf_weight
+        self.vocab, self.embeddings = utils.load_word_embedding(vocab, self.emb_file)
 
     def extract(self, train_instance):
         from stst.features.features_embedding import minavgmaxpooling
