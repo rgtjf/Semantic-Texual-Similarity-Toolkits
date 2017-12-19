@@ -21,16 +21,21 @@ you can configure `sts_model.py` to see the performance of different features on
 
 ### STSBenchmark
 
-| Methods              | Dev    | Test   |
-|----------------------|--------|--------|
-| aligner              | 0.6991 | 0.6379 |
-| idf_aligner          | 0.7969 | 0.7622 |
-| BOWFeature-True      | 0.7584 | 0.6472 |
-| BOWFeature-False     | 0.7788 | 0.6874 |
-| nGramOverlapFeature  | 0.7817 | 0.7453 |
-| BOWFeature           | 0.7639 | 0.6847 |
-| AlignmentFeature     | 0.8163 | 0.7748 |
-| WordEmbeddingFeature | 0.8011 | 0.7128 |
+| Methods                | Dev      | Test     |
+|------------------------|----------|----------|
+| RF                     | 0.8333   | 0.7993   |
+| GB                     | 0.8356   | 0.8022   |
+| EN-seven               | 0.8466   | 0.8100   |
+| ---------------------- | -------- | -------- |
+| aligner                | 0.6991   | 0.6379   |
+| idf_aligner            | 0.7969   | 0.7622   |
+| BOWFeature-True        | 0.7584   | 0.6472   |
+| BOWFeature-False       | 0.7788   | 0.6874   |
+| nGramOverlapFeature    | 0.7817   | 0.7453   |
+| BOWFeature             | 0.7639   | 0.6847   |
+| AlignmentFeature       | 0.8163   | 0.7748   |
+| WordEmbeddingFeature   | 0.8011   | 0.7128   |
+
 
 ### Reference
 [STSBenchmark board](http://ixa2.si.ehu.es/stswiki/index.php/STSbenchmark)

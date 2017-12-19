@@ -32,7 +32,7 @@ def hill_climbing(model, choose_list=[]):
     visited = [True if x in choose_list else False for x in range(len(feature_list))]
 
     for idx in range(len(choose_list), len(feature_list)):
-        chooseIndex = -1
+        choose_index = -1
         best_score = 0.0
         best_test_score = 0.0
         chooses.append(-1)
@@ -45,17 +45,17 @@ def hill_climbing(model, choose_list=[]):
                 train_sts(model)
                 cur_score = dev_sts(model)
                 test_score = test_sts(model)
-                stst.record('./data/records.csv', cur_score, test_score, model)
+                stst.record('./records.csv', cur_score, test_score, model)
                 if best_score < cur_score:
-                    chooseIndex = i
+                    choose_index = i
                     best_score = cur_score
                     best_test_score = test_score
 
-        chooses[idx] = chooseIndex
-        visited[chooseIndex] = True
+        chooses[idx] = choose_index
+        visited[choose_index] = True
         # feature = [ feature_list[s] for s in chooses]
         print('Best Score: %.2f %%,  %.2f%%,choose Feature %s' % (best_score * 100, best_test_score * 100,
-                                                                  feature_list[chooseIndex].feature_name))
+                                                                  feature_list[choose_index].feature_name))
 
 def feature_ablation(model):
     feature_list = model.feature_list
