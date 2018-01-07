@@ -3,6 +3,7 @@ import stst
 
 nlp = stst.StanfordNLP('http://localhost:9000')
 
+
 def train_sts(model):
     train_file = './data/stsbenchmark/sts-train.csv'
     train_instances = stst.load_parse_data(train_file, nlp)

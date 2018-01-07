@@ -98,7 +98,6 @@ class DefineFeature(stst.Feature):
         return features, infos
 
 
-
 classifier = stst.Classifier(stst.classifier.AverageEnsemble())
 
 model = stst.Model('basic_model', classifier)

@@ -1,64 +1,37 @@
-﻿# Semantic Textual Similarity Toolkits
+﻿# Baseline System of Low Resource Task
 
-A light version of STST
-
-Our goal:
-1. easy and fast to build a nlp system
-2. it's easy to use a library to be integrated into other systems.
-3. and so on.
+using stst to build a baseline system of low-resource task 
 
 
+## Install
 
-## How to use it?
-```python
-import stst
-
-classifier = stst.Classifier('classifier')
-
-model = stst.Model('model', classifier)
-
-class DefineFeature(stst.Feature):
-    def extract(self):
-        pass
-
-class DefineData(stst.Data):
-
-    def __init__(self):
-        pass
-
-    def load_from_file():
-        pass
-
-    def __iter__(self):
-        pass
-
-class DefineEval(stst.Eval):
-
-    def measure(self, a, b):
-        pass
-
-
-model.add(Define(Feature))
-train_data = {文本/数字} field
-
-
-model.train_model(train_data)
-model.test_model(test_data)
-
+```
+pip install stst
 
 ```
 
 
-## Installation
-1. download the repo
-2. python
-    - requirements.txt
-    - Usage
-    ```
-    $ pip install -r requirements.txt
-3. Run
+es test 2934/3071 95.54
 
-    ```
-    cd test
-    python train.py
-    ```
+ar test 1312/1449 90.55
+
+
+
+## Step
+
+- how to prepare data
+
+```
+how to write this file
+1. define the example, like what you want to get from one example
+2. init the data from different place, and return the train/dev/test set.abs
+3. `write_to_json` and `read_from_json`. `read_from_json` return the example list of required data
+
+- in the `main.py`
+    only need to read_from_json
+- in the 'definefeature.py'
+    consider the form of the examples
+```
+
+- how to translate data to nn
+

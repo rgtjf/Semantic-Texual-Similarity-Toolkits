@@ -1,6 +1,7 @@
 # pycharm
 .idea/
 .vscode/
+./data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -21,3 +22,5 @@ __pycache__/
 .tox/
 stst.egg-info/
 ./iclr2016-test/data/
+/data/
+/data_clean/
