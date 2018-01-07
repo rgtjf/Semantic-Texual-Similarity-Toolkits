@@ -1,0 +1,3 @@
+[submodule "src_nn"]
+	path = src_nn
+	url = https://github.com/rgtjf/Low-Resource-STS-Task.git

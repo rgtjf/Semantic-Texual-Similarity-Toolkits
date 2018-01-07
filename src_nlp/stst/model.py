@@ -7,10 +7,11 @@ import random
 from stst import utils, config
 from stst import Feature
 
+
 class Model(object):
-    def __init__(self,
-                 model_name,
-                 classifier):
+
+    def __init__(self, model_name, classifier):
+
         self.model_name = model_name
 
         self.feature_name = model_name
@@ -18,7 +19,6 @@ class Model(object):
         self.classifier = classifier
 
         self.feature_list = []
-
         self.train_feature_file = '{}/{}.feature.train.txt'.format(
             config.MODEL_DIR, self.model_name)
         self.dev_feature_file = '{}/{}.feature.dev.txt'.format(
@@ -31,7 +31,6 @@ class Model(object):
 
         self.get_output_file = lambda train_file: '{}/{}/{}'.format(
             config.OUTPUT_DIR, self.model_name, os.path.basename(train_file))
-
 
     def add(self, feature):
         self.feature_list.append(feature)

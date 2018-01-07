@@ -122,7 +122,7 @@ class DictVocab(object):
             else:
                 keys = sorted(items, cmp=lambda x: x[1], reverse=reverse)
             for key in keys:
-                print("{}\t{}".format(key, vocab[key]), flle=fw)
+                print("{}\t{}".format(key, vocab[key]), file=fw)
         print('dump to FILE {}'.format(file_path))
 
 
@@ -334,15 +334,15 @@ def write_dict_to_csv(contents_dict, to_file):
         writer.writerows(contents)
 
 
-def create_write_file(file_name, mode='w'):
+def create_write_file(file_name, mode='w', encoding='utf8'):
     path = os.path.split(file_name)[0]
     if not os.path.exists(path):
         os.makedirs(path)
-    return codecs.open(file_name, mode, encoding='utf8')
+    return codecs.open(file_name, mode, encoding=encoding)
 
 
-def create_read_file(file_name, mode='r'):
-    return codecs.open(file_name, mode, encoding='utf8')
+def create_read_file(file_name, mode='r', encoding='utf8'):
+    return codecs.open(file_name, mode, encoding=encoding)
 
 
 def check_file_exist(file_path):
@@ -394,12 +394,19 @@ def load_word_embedding(vocab, emb_file, n_dim,
         for idx, line in enumerate(f):
             if idx == 0 and len(line.split()) == 2:
                 continue
-            sp = line.rstrip().split()
-            if len(sp) != n_dim + 1:
-                print(sp[0:len(sp) - n_dim])
+            sp = line.rstrip().split(' ')
+            
+            if len(sp) < n_dim:
+                print('%s len < ndim' % line)
+                continue
 
-            w = ''.join(sp[0:len(sp) - n_dim])
-            emb = [float(x) for x in sp[len(sp) - n_dim:]]
+            pos = len(sp) - n_dim
+            if len(sp) != n_dim + 1:
+                print(len(sp))
+                print(sp[:pos])
+
+            w = ' '.join(sp[0:pos])
+            emb = [float(x) for x in sp[pos:]]
 
             if w in vocab and w not in pre_trained:
                 embeddings[vocab[w]] = emb
