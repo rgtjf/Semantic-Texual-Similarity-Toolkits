@@ -640,15 +640,9 @@ def chebyshev_distance(v1, v2, norm=False):
 #############################################
 
 def longest_common_suffix(sa, sb):
-    l = min(len(sa), len(sb))
-    r = 0
-    for i in range(l):
-        idx = l - 1 - i
-        if sa[idx] != sb[idx]:
-            r = i
-            break
-    rr = 0.0 if l == 0 else 1. * r / l
-    return rr
+    sa = sa[::-1]
+    sb = sb[::-1]
+    return longest_common_prefix(sa, sb)
 
 
 def longest_common_prefix(sa, sb):
@@ -656,15 +650,12 @@ def longest_common_prefix(sa, sb):
     r = 0
     for i in range(l):
         idx = i
-        if sa[idx] != sb[idx]:
-            r = i
+        if sa[idx] == sb[idx]:
+            r = i + 1
+        else:
             break
     rr = 0.0 if l == 0 else 1.0 * r / l
     return rr
-
-print("asdf")
-print(longest_common_prefix("abcd", "aabcd"))
-print(longest_common_suffix("abcd", "aabcd"))
 
 
 def longest_common_substring(sa, sb):
@@ -697,13 +688,12 @@ def longest_common_sequence(sa, sb):
     rr = 0.0 if l == 0 else 1.0 * r / l
     return rr
 
-print(longest_common_sequence("a b cd", "a d b cd"))
-
 
 def levenshtein_disttance(sa, sb):
     la = len(sa)
     lb = len(sb)
     l = min(la, lb)
+
     dp = np.zeros((la+1, lb+1), dtype=np.int)
 
     for i in range(0, la + 1):
