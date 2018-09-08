@@ -95,6 +95,7 @@ def get_time_name(prefix):
     time_str = datetime.datetime.now().strftime('_%m%d_%H_%M')
     return prefix + time_str
 
+
 def get_logger(file_name):
     """ return the default logger """
     # Logger Part
@@ -640,19 +641,19 @@ def chebyshev_distance(v1, v2, norm=False):
 
 def longest_common_suffix(sa, sb):
     l = min(len(sa), len(sb))
-    r = l
+    r = 0
     for i in range(l):
         idx = l - 1 - i
         if sa[idx] != sb[idx]:
             r = i
             break
-    rr = 0.0 if l == 0 else r / l
+    rr = 0.0 if l == 0 else 1. * r / l
     return rr
 
 
 def longest_common_prefix(sa, sb):
     l = min(len(sa), len(sb))
-    r = l
+    r = 0
     for i in range(l):
         idx = i
         if sa[idx] != sb[idx]:
@@ -660,6 +661,10 @@ def longest_common_prefix(sa, sb):
             break
     rr = 0.0 if l == 0 else 1.0 * r / l
     return rr
+
+print("asdf")
+print(longest_common_prefix("abcd", "aabcd"))
+print(longest_common_suffix("abcd", "aabcd"))
 
 
 def longest_common_substring(sa, sb):
@@ -681,7 +686,7 @@ def longest_common_sequence(sa, sb):
     la = len(sa)
     lb = len(sb)
     l = min(la, lb)
-    dp = [[0] * (lb + 1)] * (la + 1)
+    dp = np.zeros((la+1, lb+1), dtype=np.int)
     for i in range(1, la + 1):
         for j in range(1, lb + 1):
             if sa[i - 1] == sb[j - 1]:
@@ -692,12 +697,15 @@ def longest_common_sequence(sa, sb):
     rr = 0.0 if l == 0 else 1.0 * r / l
     return rr
 
+print(longest_common_sequence("a b cd", "a d b cd"))
+
 
 def levenshtein_disttance(sa, sb):
     la = len(sa)
     lb = len(sb)
     l = min(la, lb)
-    dp = [[0] * (lb + 1)] * (la + 1)
+    dp = np.zeros((la+1, lb+1), dtype=np.int)
+
     for i in range(0, la + 1):
         dp[i][0] = i
     for j in range(0, lb + 1):

@@ -3,7 +3,7 @@ import json
 
 import pyprind
 
-from stst.features.features import Feature
+from stst.modules.features import Feature
 from stst import utils
 from stst.libs.word_aligner import aligner
 
