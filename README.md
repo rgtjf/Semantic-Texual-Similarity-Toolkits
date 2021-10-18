@@ -4,6 +4,8 @@
 
 This is the code by [ECNU team](http://aclweb.org/anthology/S/S17/S17-2028.pdf) submitted to SemEval STS Task.
 
+[slides]()
+
 ## Installation
 
 ```bash
@@ -38,9 +40,27 @@ you can configure `sts_model.py` to see the performance of different features on
 
 
 ### Reference
+
 [STSBenchmark board](http://ixa2.si.ehu.es/stswiki/index.php/STSbenchmark)
 
 
 ## Contacts
 Any questions, please feel free to contact us:
 rgtjf1 AT 163 DOT com
+
+## Citation
+If you find this responsity helpful, please cite our paper.
+```
+@inproceedings{tian-etal-2017-ecnu,
+    title = "{ECNU} at {S}em{E}val-2017 Task 1: Leverage Kernel-based Traditional {NLP} features and Neural Networks to Build a Universal Model for Multilingual and Cross-lingual Semantic Textual Similarity",
+    author = "Tian, Junfeng  and
+      Zhou, Zhiheng  and
+      Lan, Man  and
+      Wu, Yuanbin",
+    booktitle = "Proceedings of the 11th International Workshop on Semantic Evaluation ({S}em{E}val-2017)",
+    year = "2017",
+    url = "https://aclanthology.org/S17-2028",
+    pages = "191--197"
+}
+```
+
